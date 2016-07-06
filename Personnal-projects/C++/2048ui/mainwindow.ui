@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>864</width>
+    <height>430</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QLCDNumber" name="timer">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>360</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>20</y>
+      <width>791</width>
+      <height>291</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLCDNumber" name="lcdNumber00"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLCDNumber" name="lcdNumber01"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLCDNumber" name="lcdNumber02"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLCDNumber" name="lcdNumber03"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLCDNumber" name="lcdNumber10"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLCDNumber" name="lcdNumber11"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLCDNumber" name="lcdNumber12"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLCDNumber" name="lcdNumber13"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLCDNumber" name="lcdNumber20"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLCDNumber" name="lcdNumber21"/>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLCDNumber" name="lcdNumber22"/>
+     </item>
+     <item row="2" column="3">
+      <widget class="QLCDNumber" name="lcdNumber23"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLCDNumber" name="lcdNumber30"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLCDNumber" name="lcdNumber31"/>
+     </item>
+     <item row="3" column="2">
+      <widget class="QLCDNumber" name="lcdNumber32"/>
+     </item>
+     <item row="3" column="3">
+      <widget class="QLCDNumber" name="lcdNumber33"/>
+     </item>
+    </layout>
+    <zorder>lcdNumber01</zorder>
+    <zorder>lcdNumber02</zorder>
+    <zorder>lcdNumber03</zorder>
+    <zorder>lcdNumber10</zorder>
+    <zorder>lcdNumber11</zorder>
+    <zorder>lcdNumber12</zorder>
+    <zorder>lcdNumber13</zorder>
+    <zorder>lcdNumber20</zorder>
+    <zorder>lcdNumber21</zorder>
+    <zorder>lcdNumber22</zorder>
+    <zorder>lcdNumber23</zorder>
+    <zorder>lcdNumber30</zorder>
+    <zorder>lcdNumber31</zorder>
+    <zorder>lcdNumber32</zorder>
+    <zorder>lcdNumber33</zorder>
+    <zorder>lcdNumber00</zorder>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>330</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Time:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="myreminder">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>360</y>
+      <width>301</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
