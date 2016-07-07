@@ -307,9 +307,8 @@ void MainWindow::on_Newgame()
 {
     mygame.init();
     ui->timer->display("0");
-//    mytime.restart();
     myowntimer = 0;
-//    mycount.start();
+    mycount.stop();
     my_time_record = 9999;
     my_number_record = 2;
     permit = 1;
