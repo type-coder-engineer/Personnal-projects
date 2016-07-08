@@ -104,58 +104,61 @@ void MainWindow::update_view(){
 
 // 键盘时间的switch
 void MainWindow::keyPressEvent(QKeyEvent *qke){
-    if (qke->key() == Qt::Key_Space){ // 空格键可以暂停
-        if (break_flag == 1){
-            permit = 0;
-            mycount.stop();
-            break_flag = 0;
+    if (game_over == 0){
+        if (qke->key() == Qt::Key_Space){ // 空格键可以暂停
+            if (break_flag == 1){
+                permit = 0;
+                mycount.stop();
+                break_flag = 0;
+            }
+            else {
+                permit = 1;
+                if (game_begin == 1)
+                    mycount.start();
+                break_flag = 1;
+            }
         }
-        else {
-            permit = 1;
-            if (game_begin == 1)
+        else if (permit == 1){ // 设置一个permit，这样输完record后就不能用键盘控制了，要重新开始游戏才能把permit重新设为1
+            if (game_begin == 0){ // 一开始按动移动键开始计时
+                game_begin = 1;
                 mycount.start();
-            break_flag = 1;
+            }
+            switch(qke->key()){
+                case Qt::Key_Up:
+                    mygame.calculate_up();
+                    mygame.newnum();
+                    update_view();
+                    showreminder();
+                break;
+
+                case Qt::Key_Down:
+                    mygame.calculate_down();
+                    mygame.newnum();
+                    update_view();
+                    showreminder();
+                break;
+
+                case Qt::Key_Left:
+                    mygame.calculate_left();
+                    mygame.newnum();
+                    update_view();
+                    showreminder();
+                break;
+
+                case Qt::Key_Right:
+                    mygame.calculate_right();
+                    mygame.newnum();
+                    update_view();
+                    showreminder();
+                break;
+
+                default:
+                    return ;
+            }
         }
     }
-    else if (permit == 1){ // 设置一个permit，这样输完record后就不能用键盘控制了，要重新开始游戏才能把permit重新设为1
-        if (game_begin == 0){ // 一开始按动移动键开始计时
-            game_begin = 1;
-            mycount.start();
-        }
-        switch(qke->key()){
-            case Qt::Key_Up:
-                mygame.calculate_up();
-                mygame.newnum();
-                update_view();
-                showreminder();
-            break;
-
-            case Qt::Key_Down:
-                mygame.calculate_down();
-                mygame.newnum();
-                update_view();
-                showreminder();
-            break;
-
-            case Qt::Key_Left:
-                mygame.calculate_left();
-                mygame.newnum();
-                update_view();
-                showreminder();
-            break;
-
-            case Qt::Key_Right:
-                mygame.calculate_right();
-                mygame.newnum();
-                update_view();
-                showreminder();
-            break;
-
-            default:
-                return ;
-        }
-    }
-    return ;
+    else
+        return ;
 }
 
 // 显示计时器
@@ -258,7 +261,7 @@ void MainWindow::on_Isover(){
 void MainWindow::showreminder(){
     QStringList data; // 因为settext只能是QStrng的形参，所以我用QStringList来输入多格式的文本，不知道有没有别的方法,似乎还可以用html的格式写来实现，以后再研究
     QString str = "";
-    if (game_begin == 1){
+    if (game_begin == 1 && game_over == 0){
         if (mygame.biggest() != 2048)
             data << "You have reached " << tr("%1").arg(mygame.biggest());
         else{
@@ -269,8 +272,10 @@ void MainWindow::showreminder(){
             str += s;
         }
     }
-    else
+    else if (game_begin == 0 && game_over == 0)
         str.push_back("Please tap any direction key to get started");
+    else
+        str.push_back("The game is over, you can restart by \"New Game\" or quit the game");
     ui->myreminder->setText(str);
     QFont ft;
     ft.setPointSize(12); // 设置字体大小，数字越大就越大
@@ -314,6 +319,7 @@ void MainWindow::on_Newgame()
     permit = 1;
     break_flag = 1;
     game_begin = 0;
+    game_over = 0;
     update_view();
     showreminder();
 }
@@ -406,13 +412,15 @@ void MainWindow::on_Setrecord(){
             }
         }
     permit = 0;
+    game_over = 1;
+    showreminder();
 }
 
 // 游戏介绍
 void MainWindow::on_about_game(){
     QString introduction(
         "<h2>" + tr("About 2048") + "</h2>"
-        + "<p>" + tr("This game is played by using the direction keys to move the numbers, the numbers on the moving direction will be accumulated automatiquely if they are the same. At first you need to tap any dirction to get started the time_counter, in the game you can tap space key to take a break and tap again to get back in the game. Besides the first move, the new number appeared will not be certainly 2, there is a possibility that it will be 4 or 8. The game is over when there are no room for new number and no possibility to accumulate. There are two records, one is the time min to reach 2048 and the other one is the biggest number you have reached. Enjoy your game!")+"</p>"
+        + "<p>" + tr("This game is played by using the direction keys to move the numbers, the numbers on the moving direction will be accumulated automatiquely if they are the same. At first you need to tap any direction to start the timer, afterwards in the game you can tap space key to take a break and tap again to get back. After the first move, the new number appeared will not be certainly 2, there is a possibility that it will be 4 or 8. The game is over when there are no rooms for new numbers and no possibilities to accumulate between two numbers. I set up two records, of which one is the minimal time to reach 2048 and the other one is the maximal number you have reached. Enjoy your game!")+"</p>"
         + "<p>" + tr("Please see ") + "<a href=https://github.com/type-coder-engineer>https://github.com/type-coder-engineer</a>"+tr(" to find more interesting personnal projects by me")+"</p>"
         + "<br>" + tr("Author: ")+ "ZHANG Chenyu" + "</br>"
     );
