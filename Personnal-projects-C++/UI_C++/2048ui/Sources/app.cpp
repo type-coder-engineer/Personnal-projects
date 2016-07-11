@@ -82,11 +82,12 @@ void app_2048::calculate_right(){
 void app_2048::newnum(){
     int *res = 0;
     int fill = 1;
-    int count = 0;
+ //   int count = 0;
     for(int i = 0; i != H; ++i){
         res = std::find(map[i], map[i] + L, 0);
         if (res != map[i] + L){
             fill = 0;
+            break;
         }
         else
             continue;
@@ -99,28 +100,29 @@ void app_2048::newnum(){
             x = rand()%H;    //产生数字
             y = rand()%L;
         }
+// 本来这里是有一个出现的数字不是2而是场上最小的数字的算法的，但是发现这样就过于简单了，所以就去掉了
+//        int base = basicnum * 4;  // 注意这边和MATLAB不一样，4次方不能用^
 
-        int base = basicnum * 4;  // 注意这边和MATLAB不一样，4次方不能用^
-
-        // 如果之后场上只有4或4以上的，那么新出现的数就不是2了，最大会直接出现8
-        for (int j = 0; j != L; ++j){
-            for (int i = 0; i != H; ++i){
-                if (map[i][j] != 0){
-                    ++count;
-                    base = issmaller(map[i][j], base);
-                }
-            }
-        }
-        if (count != 1) // 防止一开始的两个数直接加起来就只直接变成4了。
-            map[x][y] = base;
-        else
-            map[x][y] = basicnum;
+//        // 如果之后场上只有4或4以上的，那么新出现的数就不是2了，最大会直接出现8
+//        for (int j = 0; j != L; ++j){
+//            for (int i = 0; i != H; ++i){
+//                if (map[i][j] != 0){
+//                    ++count;
+//                    base = issmaller(map[i][j], base);
+//                }
+//            }
+//        }
+//        if (count != 1) // 防止一开始的两个数直接加起来就只直接变成4了。
+//            map[x][y] = base;
+//        else
+//            map[x][y] = basicnum;
+        map[x][y] = basicnum;
     }
 }
 
 // 判断游戏是否结束了
 int app_2048::det(){
-    int *res; //用来寻找有没有0的指针
+    int *res = 0; //用来寻找有没有0的指针
     int fill = 1;
     vector<int> range;
     for(int i = 0; i != H; ++i){

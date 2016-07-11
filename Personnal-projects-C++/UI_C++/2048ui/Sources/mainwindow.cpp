@@ -266,7 +266,10 @@ void MainWindow::showreminder(){
             data << "You have reached " << tr("%1").arg(mygame.biggest());
         else{
             data << "Congratulation! You have reached 2048 in " << tr("%1").arg(myowntimer) << " seconds";
-            my_time_record = myowntimer;
+            if (flag2048 == 0){
+                my_time_record = myowntimer;
+                flag2048 = 1;
+            }
         }
         foreach(QString s, data){
             str += s;
@@ -320,6 +323,7 @@ void MainWindow::on_Newgame()
     break_flag = 1;
     game_begin = 0;
     game_over = 0;
+    flag2048 = 0;
     update_view();
     showreminder();
 }
@@ -420,7 +424,7 @@ void MainWindow::on_Setrecord(){
 void MainWindow::on_about_game(){
     QString introduction(
         "<h2>" + tr("About 2048") + "</h2>"
-        + "<p>" + tr("This game is played by using the direction keys to move the numbers, the numbers on the moving direction will be accumulated automatiquely if they are the same. At first you need to tap any direction to start the timer, afterwards in the game you can tap space key to take a break and tap again to get back. After the first move, the new number appeared will not be certainly 2, there is a possibility that it will be 4 or 8. The game is over when there are no rooms for new numbers and no possibilities to accumulate between two numbers. I set up two records, of which one is the minimal time to reach 2048 and the other one is the maximal number you have reached. Enjoy your game!")+"</p>"
+        + "<p>" + tr("This game is played by using the direction keys to move the numbers, the numbers on the moving direction will be accumulated automatiquely if they are the same. At first you need to tap any direction to start the timer, afterwards in the game you can tap space key to take a break and tap again to get back. The game is over when there are no rooms for new numbers and no possibilities to accumulate between two numbers. I set up two records, of which one is the minimal time to reach 2048 and the other one is the maximal number you have reached. Enjoy your game!")+"</p>"
         + "<p>" + tr("Please see ") + "<a href=https://github.com/type-coder-engineer>https://github.com/type-coder-engineer</a>"+tr(" to find more interesting personnal projects by me")+"</p>"
         + "<br>" + tr("Author: ")+ "ZHANG Chenyu" + "</br>"
     );

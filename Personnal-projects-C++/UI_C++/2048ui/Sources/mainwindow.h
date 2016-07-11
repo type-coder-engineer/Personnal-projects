@@ -68,6 +68,7 @@ private:
     int myowntimer;
     int game_begin;
     int game_over;
+    int flag2048;
     QString time_record_name;
     QString number_record_name;
     QToolBar *mytoolbar;
