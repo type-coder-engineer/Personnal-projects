@@ -54,9 +54,18 @@ def compare(error):
     pbar.finish()
     
 if __name__ == "__main__":
+    sys = os.name
+    if sys == 'nt':
+        separator = '\\'
+    elif sys == 'posix':
+        separator = '/'
+    else:
+        print 'Current system is not known...'
+        exit()
+        
     path = os.getcwd()
-    path1 = path + '\\group1'
-    path2 = path + '\\group2'
+    path1 = path + separator + 'group1'
+    path2 = path + separator + 'group2'
     listDiff = list()
     error = 600
     compare(error)
@@ -66,13 +75,13 @@ if __name__ == "__main__":
         error += 200
         compare(error)
 
-    if os.path.exists(path + '\\Result'):
-        shutil.rmtree(path + '\\Result')  #删除一个非空目录
-    os.mkdir(path + '\\Result')
+    if os.path.exists(path + separator + 'Result'):
+        shutil.rmtree(path + separator + 'Result')  #删除一个非空目录
+    os.mkdir(path + separator + 'Result')
     
     os.chdir(path1)
     for one in listDiff:
-        shutil.copy(one, path + '\\Result')
+        shutil.copy(one, path + separator + 'Result')
    
     print "All done!"
         

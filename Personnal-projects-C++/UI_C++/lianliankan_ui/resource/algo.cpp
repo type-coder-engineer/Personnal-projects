@@ -308,7 +308,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int flag = 0;
                 int tem = check.disleft2 - abs(fourpoints.x1 - fourpoints.x2);
                 for(int i = 0; i != issmaller(check.disleft1, tem); ++i){
-                    for(int j = fourpoints.y1; j != fourpoints.y2; ++j){
+                    for(int j = fourpoints.y1; j != fourpoints.y2 + 1; ++j){
                         if(map[j][fourpoints.x1 - i - 1] != 0){
                             flag = 1;
                             break;
@@ -325,7 +325,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int flag = 0;
                 int tem = check.disup2 - abs(fourpoints.y1 - fourpoints.y2);
                 for(int i = 0; i != issmaller(check.disup1, tem); ++i){
-                    for(int j = fourpoints.x1; j != fourpoints.x2; ++j){
+                    for(int j = fourpoints.x1; j != fourpoints.x2 + 1; ++j){
                         if(map[fourpoints.y1 - i - 1][j] != 0){
                             flag = 1;
                             break;
@@ -342,7 +342,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int flag = 0;
                 int tem = check.disright1 - abs(fourpoints.x1 - fourpoints.x2);
                 for(int i = 0; i != issmaller(check.disright2, tem); ++i){
-                    for(int j = fourpoints.y1; j != fourpoints.y2; ++j){
+                    for(int j = fourpoints.y1; j != fourpoints.y2 + 1; ++j){
                         if(map[j][fourpoints.x2 + i + 1] != 0){
                             flag = 1;
                             break;
@@ -359,7 +359,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int flag = 0;
                 int tem = check.disdown1 - abs(fourpoints.y1 - fourpoints.y2);
                 for(int i = 0; i != issmaller(check.disdown2, tem); ++i){
-                    for(int j = fourpoints.x1; j != fourpoints.x2; ++j){
+                    for(int j = fourpoints.x1; j != fourpoints.x2 + 1; ++j){
                         if(map[fourpoints.y2 + i + 1][j] != 0){
                             flag = 1;
                             break;
@@ -377,8 +377,8 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int tem1 = fourpoints.x2 - check.disleft2;
                 int tem2 = fourpoints.x1 + check.disright1 + 1;
                 int tem3 = fourpoints.x1 + 1;
-                for(int j = isbigger(tem3, tem1); j != issmaller(fourpoints.x2, tem2) ; ++j){
-                    for(int i = fourpoints.y1; i != fourpoints.y2; ++i){
+                for(int j = isbigger(tem3, tem1); j != issmaller(fourpoints.x2, tem2); ++j){
+                    for(int i = fourpoints.y1; i != fourpoints.y2 + 1; ++i){
                         if(map[i][j] != 0){
                             flag = 1;
                             break;
@@ -397,7 +397,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int tem2 = fourpoints.y1 + check.disdown1 + 1;
                 int tem3 = fourpoints.y1 + 1;
                 for(int j = isbigger(tem3, tem1); j != issmaller(fourpoints.y2, tem2) ; ++j){
-                    for(int i = fourpoints.x1; i != fourpoints.x2; ++i){
+                    for(int i = fourpoints.x1; i != fourpoints.x2 + 1; ++i){
                         if(map[j][i] != 0){
                             flag = 1;
                             break;
@@ -427,7 +427,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int flag = 0;
                 int tem = check.disleft1 - abs(fourpoints.x1 - fourpoints.x2);
                 for(int i = 0; i != issmaller(check.disleft2, tem); ++i){
-                    for(int j = fourpoints.y1; j != fourpoints.y2; ++j){
+                    for(int j = fourpoints.y1; j != fourpoints.y2 + 1; ++j){
                         if(map[j][fourpoints.x2 - i - 1] != 0){
                             flag = 1;
                             break;
@@ -444,7 +444,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int flag = 0;
                 int tem = check.disup2 - abs(fourpoints.y1 - fourpoints.y2);
                 for(int i = 0; i != issmaller(check.disup1, tem); ++i){
-                    for(int j = fourpoints.x2; j != fourpoints.x1; ++j){
+                    for(int j = fourpoints.x2; j != fourpoints.x1 + 1; ++j){
                         if(map[fourpoints.y1 - i - 1][j] != 0){
                             flag = 1;
                             break;
@@ -461,7 +461,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int flag = 0;
                 int tem = check.disright2 - abs(fourpoints.x1 - fourpoints.x2);
                 for(int i = 0; i != issmaller(check.disright1, tem); ++i){
-                    for(int j = fourpoints.y1; j != fourpoints.y2; ++j){
+                    for(int j = fourpoints.y1; j != fourpoints.y2 + 1; ++j){
                         if(map[j][fourpoints.x1 + i + 1] != 0){
                             flag = 1;
                             break;
@@ -478,7 +478,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int flag = 0;
                 int tem = check.disdown1 - abs(fourpoints.y1 - fourpoints.y2);
                 for(int i = 0; i != issmaller(check.disdown2, tem); ++i){
-                    for(int j = fourpoints.x2; j != fourpoints.x1; ++j){
+                    for(int j = fourpoints.x2; j != fourpoints.x1 + 1; ++j){
                         if(map[fourpoints.y2 + i + 1][j] != 0){
                             flag = 1;
                             break;
@@ -497,7 +497,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int tem2 = fourpoints.x2 + check.disright2 + 1;
                 int tem3 = fourpoints.x2 + 1;
                 for(int j = isbigger(tem3, tem1); j != issmaller(fourpoints.x1, tem2) ; ++j){
-                    for(int i = fourpoints.y1; i != fourpoints.y2; ++i){
+                    for(int i = fourpoints.y1; i != fourpoints.y2 + 1; ++i){
                         if(map[i][j] != 0){
                             flag = 1;
                             break;
@@ -516,7 +516,7 @@ int fun::check(positions fourpoints){ // 这种debug就直接在测试中看哪�
                 int tem2 = fourpoints.y1 + check.disdown1 + 1;
                 int tem3 = fourpoints.y1 + 1;
                 for(int j = isbigger(tem3, tem1); j != issmaller(fourpoints.y2, tem2) ; ++j){
-                    for(int i = fourpoints.x2; i != fourpoints.x1; ++i){
+                    for(int i = fourpoints.x2; i != fourpoints.x1 + 1; ++i){
                         if(map[j][i] != 0){
                             flag = 1;
                             break;
