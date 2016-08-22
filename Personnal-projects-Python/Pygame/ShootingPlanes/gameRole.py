@@ -7,8 +7,8 @@ Created on Wed Sep 11 16:36:03 2013
 
 import pygame
 
-SCREEN_WIDTH = 480
-SCREEN_HEIGHT = 700
+SCREEN_WIDTH = 680
+SCREEN_HEIGHT = 600
 
 TYPE_SMALL = 1
 TYPE_MIDDLE = 2
@@ -25,14 +25,24 @@ class Bullet(pygame.sprite.Sprite):
 
     def move(self):
         self.rect.top -= self.speed  # 子弹的位置不断的往前
+        
+class Enemy_bullet(pygame.sprite.Sprite):
+    def __init__(self, bullet_img, init_pos):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = bullet_img
+        self.rect = self.image.get_rect()  # 子弹的方块
+        self.rect.midbottom = init_pos
+        self.speed = 3
 
+    def move(self):
+        self.rect.top += self.speed  # 子弹的位置不断的往前
 # the class player
 class Player(pygame.sprite.Sprite):
-    def __init__(self, plane_img, player_rect, init_pos):
+    def __init__(self, resources, player_rect, init_pos):
         pygame.sprite.Sprite.__init__(self)  # 一个基本的用于可见的游戏物体的类
         self.image = []                                 # 用来存储玩家对象精灵图片的列表
         for i in range(len(player_rect)):
-            self.image.append(plane_img.subsurface(player_rect[i]).convert_alpha()) 
+            self.image.append(resources.subsurface(player_rect[i]).convert_alpha()) 
 			# image中储存的是plane img的字图片，player_rect是用来取面积的矩形
 			
         self.rect = player_rect[0]                      # 初始化图片所在的矩形
@@ -44,7 +54,7 @@ class Player(pygame.sprite.Sprite):
 
     def shoot(self, bullet_img):
         bullet = Bullet(bullet_img, self.rect.midtop)
-        self.bullets.add(bullet) # 没有这句不能显示出子弹，子弹数目还是减少的
+        self.bullets.add(bullet) # 没有这句不能显示出子弹, 因为绘制子弹用的是子弹的精灵组
 
     def moveUp(self):  #移动的时候如果要超出屏幕就不能动了
         if self.rect.top <= 0:
@@ -84,35 +94,48 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.top += self.speed
         
 class Boss(pygame.sprite.Sprite):
-    def __init__(self, boss_image, boss_down_rect, init_pos):
+    def __init__(self, resources, boss_rect, init_pos):
         pygame.sprite.Sprite.__init__(self)
-        self.image = boss_image                                 # 用来存储玩家对象精灵图片的列表
-        self.rect = self.image.get_rect()
-        self.down_images = boss_down_rect
-        # for i in range(len(boss_down_rect)):
-            # self.down_images.append(boss_image.subsurface(boss_down_rect[i]).convert_alpha()) 
+        self.images = []                              # 用来存储玩家对象精灵图片的列表
+#        self.rect = self.image.get_rect()
+        self.rect = boss_rect
+       # self.image = resources.subsurface(boss_rect[0])
+        # for i in range(len(boss_rect)):
+            # self.images.append(resources.subsurface(boss_rect[i]).convert_alpha()) 
         self.rect.topleft = init_pos
         self.speed = 3
         self.life = 20
-        self.bullet = 10
-        self.coolDown = 200
+        self.bullet_number = 5
+        self.recharge = 200
+        self.shoot_frequency = 15
+        self.down_index = 0
+        self.enemy_bullets = pygame.sprite.Group()
         
     def move(self, target):
-        if (target > 0):
-            if self.rect.right <= SCREEN_WIDTH:
+        if target > 3: # 这里用+-3 而不是0， 因为速度是3，如果是以0来判断的话跟踪的时候就会左右抖动
+            if self.rect.right >= SCREEN_WIDTH:
+                pass
+            else:
                 self.rect.right += self.speed
-            else:
-                self.rect.right = SCREEN_WIDTH
                 
-        elif (target < 0):
-            if self.rect.left  >= 0:
-                self.rect.left -= self.speed
+        elif target < -3:
+            if self.rect.left  <= 0:
+                pass
             else:
-                self.rect.left = 0
+                self.rect.left -= self.speed
+                          
+        else:
+            pass
             
-    def shoot(self):
-        bullet = Bullet(bullet_img, self.rect.midtop)
-        self.bullets.add(bullet)
+    def shoot(self, bullet_enemy_img): # 注意这里tuple不能接受下标修改，也不能直接和int相加减
+        pos1 = list(self.rect.midbottom)
+        pos1[0] = pos1[0] - 15
+        enemy_bullet = Enemy_bullet(bullet_enemy_img, tuple(pos1))
+        self.enemy_bullets.add(enemy_bullet)
+        pos2 = list(self.rect.midbottom)
+        pos2[0] = pos2[0] + 15
+        enemy_bullet = Enemy_bullet(bullet_enemy_img, tuple(pos2))
+        self.enemy_bullets.add(enemy_bullet)
    
     # def missile(self, target.x, target.y): 
         # missile = Missile(missile_image, self.rect.midtop)
