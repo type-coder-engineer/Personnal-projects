@@ -12,7 +12,7 @@ import random
 import os
 # 注意存放文件的文件夹命名不要有中文，不然会找不到同一个文件夹下的文件，比如gameRole
 
-# initialize the game
+    # initialize the game
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('shootPlanes')
@@ -27,7 +27,7 @@ get_double_bullet_sound = pygame.mixer.Sound('resources/sound/get_double_bullet.
 get_bomb_sound  = pygame.mixer.Sound('resources/sound/get_bomb.wav')
 bomb_sound = pygame.mixer.Sound('resources/sound/use_bomb.wav')
 game_over_sound = pygame.mixer.Sound('resources/sound/game_over.wav')
-
+#设置音量
 bullet_sound.set_volume(0.3)
 enemy_down_sound.set_volume(0.3)
 game_over_sound.set_volume(0.3)
@@ -38,16 +38,7 @@ bomb_sound.set_volume(0.3)
 bgm = pygame.mixer.Sound('resources/sound/game_music.wav')
 bgm.play(-1, 0)
 bgm.set_volume(0.1)
-
-# load the background
-#background = pygame.image.load(os.path.join(os.getcwd(), 'resources/image/background.png')).convert()
-# path = os.getcwd()
-# mylist = path.split('\\')
-# mypath = ''
-# for one in mylist:
-    # mypath += one
-    # mypath += '/'
-# myPath = mypath + 'resources/image/background.png'
+#设置游戏资源
 background = pygame.image.load('resources/image/back_ground.png').convert()
 gameover = pygame.image.load('resources/image/game_over.png')
 gameicon = pygame.image.load('resources/image/myPlane32.png')
@@ -72,7 +63,7 @@ bullet_img = resources.subsurface(bullet_rect)
 bullet_enemy_rect = pygame.Rect(68, 77, 10, 22)
 bullet_enemy_img = resources.subsurface(bullet_enemy_rect)
 
-# set the parameters of the players
+# 玩家飞机的图片
 player_rect = []   # 注意这个rect取的方法，第一二个点事是图片的左上角坐标，然后两个数值是宽和高
 player_rect.append(pygame.Rect(0, 99, 102, 126))        # 玩家精灵图片区域
 player_rect.append(pygame.Rect(165, 360, 102, 126))
@@ -89,9 +80,8 @@ player_down_img.append(resources.subsurface(player_rect[3]))
 player_down_img.append(resources.subsurface(player_rect[4]))
 player_down_img.append(resources.subsurface(player_rect[5]))
 player_pos = [360, 580]
-# player = Player(player_img, player_down_img, player_pos)
 
-# boss
+# boss图片
 boss_rect = pygame.Rect(165, 750, 170, 245)
 boss_img = []
 boss_img.append(resources.subsurface(pygame.Rect(165, 750, 170, 245))) # 如果在这里定义boss_image 那下面就没有问题。。。
@@ -118,9 +108,8 @@ enemy1_down_img.append(resources.subsurface(pygame.Rect(267, 347, 57, 43)))
 enemy1_down_img.append(resources.subsurface(pygame.Rect(873, 697, 57, 43)))
 enemy1_down_img.append(resources.subsurface(pygame.Rect(267, 296, 57, 43)))
 enemy1_down_img.append(resources.subsurface(pygame.Rect(930, 697, 57, 43)))
-#enemy2 2
-#正常(0, 2, 69, 90)
-#(432, 528, 69, 92)
+
+#enemy2 
 enemy2_rect = pygame.Rect(0, 2, 69, 90)
 enemy2_img = []
 enemy2_img.append(resources.subsurface(pygame.Rect(0, 2, 69, 90)))
@@ -131,37 +120,11 @@ enemy2_down_img.append(resources.subsurface(pygame.Rect(603, 654, 69, 92)))
 enemy2_down_img.append(resources.subsurface(pygame.Rect(672, 653, 69, 92)))
 enemy2_down_img.append(resources.subsurface(pygame.Rect(741, 660, 69, 85)))
 
-#enemies1 = pygame.sprite.Group()
-#bosses = pygame.sprite.Group()
-#awards = pygame.sprite.Group()
-# 存储被击毁的飞机，用来渲染击毁精灵动画
-#enemies1_down = pygame.sprite.Group()
-#bosses_down = pygame.sprite.Group()
-#shoot_enemy2_frequency = 10
-# shoot_frequency = 15
-# bomb_frequency = 15
-# bullet_number = 5
-# recharge_time = 100
-# recharging = 0
-# enemy2_frequency = 1
-# boss_frequency = 1
-# award_frequency = 1
-# award_time = 100
-# boss_flag = 0
-# boss_down_flag = 0
-# boss_once_flag = 0
-# player_down_index = 16
-
-# global myScore 
-
 def level1(clock, player):
     enemies1 = pygame.sprite.Group()  # enemy1的group
     awards = pygame.sprite.Group()  # 奖励的group
     enemies1_down = pygame.sprite.Group()  # 被击毁的就放入这个group中一起处理
-    
-    shoot_frequency = 15
-    bomb_frequency = 15
-    recharging = 0
+
     award_frequency = 1
     award_time = 100  # 第一个award出现
     boss_flag = 0
@@ -169,6 +132,8 @@ def level1(clock, player):
     boss_once_flag = 0
     myTime = 0
     running = 1
+    global myScore #注意global变量的声明一定要放在定义这个变量的block中，我是在level1中第一次定义myScore = player.score的，所以要在level1中声明myScore
+    global myGame
     
     while running:
         # 控制游戏最大帧率为60
@@ -178,45 +143,43 @@ def level1(clock, player):
         screen.blit(background, (0, 0))
         
         if boss_flag == 0 and boss_down_flag == 0:
-            if myTime % 100 == 0:  # 通过这个数字来确定出现的频率
+            if myTime % (100 - int(myTime / 50)) == 0:  # 通过这个数字来确定出现的频率
                 enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
                 enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
          #生成boss
-        if myTime >= 360  and boss_flag == 0 and boss_down_flag == 0:
+        if myTime >= 200  and boss_flag == 0 and boss_down_flag == 0:
             boss = Boss_level1(boss_img, boss_down_img, boss_pos)
-            if boss_once_flag == 0:
-                boss_once_flag = 1
+            boss_once_flag = 1
             boss_flag = 1
-            boss_down_flag = 0
     
         if boss_flag == 1:
             if boss.flag_showup == 1:
                 boss.move((player.rect.left + player.rect.right) / 2 - (boss.rect.left + boss.rect.right) / 2)
-                if boss.bullet_number > 0:
+                if boss.bullet > 0:
                     if boss.shoot_frequency == 15:
                         boss.normal_shoot(bullet_enemy_img)
                         bullet_sound.play()
                         boss.shoot_frequency = 0
-                        boss.bullet_number -= 1
+                        boss.bullet -= 1
                     else:
                         boss.shoot_frequency += 1
-                    boss_img_index = boss.shoot_frequency // 8 + 1
-                    screen.blit(boss_img[boss_img_index], boss.rect)
+                    boss.index = boss.shoot_frequency // 8 + 1
+                    screen.blit(boss.images[boss.index], boss.rect)
                 else:
                     if boss.recharge == 0:
-                        boss.bullet_number = 5;
+                        boss.bullet = boss.bullet_max;
                         boss.recharge = 200
                     else:
                         boss.recharge -= 1
-                    screen.blit(boss_img[0], boss.rect)
+                    screen.blit(boss.images[0], boss.rect)
             else:
                 boss.show()
                 if boss.flag_sound == 0:
                     boss_show_sound.play()
                     boss.flag_sound = 1
-                screen.blit(boss_img[0], boss.rect)
+                screen.blit(boss.images[0], boss.rect)
                 
             #boss和玩家相撞   
             if pygame.sprite.collide_rect(boss, player):
@@ -226,9 +189,10 @@ def level1(clock, player):
                 
             #发现没有合适的函数，要去看文档！！
             if pygame.sprite.spritecollideany(boss, player.bullets):
-                boss.life -= 1
+                if boss.flag_showup == 1:
+                    boss.life -= 1
                 player.bullets.remove(bullet) #要注意一旦击中就要删除子弹，不然下次循环还会把这颗子弹算上去
-             #注意一开始player和boss的子弹都是bullet，然后就有问题了，remove不掉了，后来把boss的子弹名字改成enemy_bullet就OK了
+                #注意一开始player和boss的子弹都是bullet，然后就有问题了，remove不掉了，后来把boss的子弹名字改成enemy_bullet就OK了
             if boss.life <= 0:
                 boss_flag = 0
                 boss_down_flag = 1
@@ -288,6 +252,8 @@ def level1(clock, player):
             if boss.down_index == 59:
                 boss_down_flag = 0
                 running = 0
+                myGame = 1
+                myScore = player.score
 
         # 生成奖励
         if award_frequency == award_time:
@@ -310,7 +276,7 @@ def level1(clock, player):
         for award in awards:
             award.move()
                 #是否获得奖励
-            if pygame.sprite.collide_circle(player, award):
+            if pygame.sprite.collide_rect(player, award):
                 if award.kind == 1:
                     player.NL_bullet_time = 400
                     get_double_bullet_sound.play()
@@ -328,26 +294,37 @@ def level1(clock, player):
             screen.blit(player.image[player.index], player.rect)
             # 更换图片索引使飞机有动画效果
             player.index = player.shoot_frequency // 8  # 注意这里有一个射子弹喷火的小动画，所以子弹频率设成了15
-        else:
-            score = player.score
+        else:  
             player.index = player.down_index // 8 #用这种准循环来实现玩家飞机爆炸的效果
             screen.blit(player.down_imgs[player.index], player.rect)
             player.down_index += 1
             if player.down_index > 31:
                 running = 0  # 效果结束后这个循环就结束了
-
+                myGame = 0
+                myScore = player.score
+                
  # 绘制子弹和和奖励和敌机
         player.bullets.draw(screen)
         awards.draw(screen)
         enemies1.draw(screen)
             
         # 绘制得分
-        player.score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
-        player.score_text = player.score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
-        text_rect = player.score_text.get_rect()
+        score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+        score_text = score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
+        text_rect = score_text.get_rect()
         text_rect.topleft = [10, 5]
-        screen.blit(player.score_text, text_rect)
-        
+        screen.blit(score_text, text_rect)
+        # 绘制boss血量
+        if boss_flag == 1 and boss_down_flag == 0:
+            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            strbosslife = ''
+            for i in range(0, boss.life):
+                strbosslife += '[]'
+            boss_life_text = boss_life_font.render('Boss level1: ' + strbosslife, True, (128, 128, 128))
+            boss_life_rect = boss_life_text.get_rect()
+            boss_life_rect.topleft = [30, SCREEN_HEIGHT - 40]
+            screen.blit(boss_life_text, boss_life_rect)
+                
         # 绘制子弹数目和bomb数目
         bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
@@ -361,7 +338,7 @@ def level1(clock, player):
             else:
                 bullet_text = bullet_font.render('Recharging...' , True, (128, 128, 128))
         bulletText_rect = bullet_text.get_rect()
-        bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定位置
+        bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定bullet的位置
         screen.blit(bullet_text, bulletText_rect)
         bomb_font = pygame.font.Font('freesansbold.ttf', 20)
         bomb_text = bomb_font.render('Bomb x ' + str(player.bomb), True, (128, 128, 128))
@@ -386,7 +363,7 @@ def level1(clock, player):
                     player.bomb -= 1
                     player.bomb_frequency = 0
                     if boss_flag == 1:
-                        boss.life -= 8
+                        boss.life -= boss.bomb_damage
                         for enemy_bullet in boss.enemy_bullets:
                             boss.enemy_bullets.remove(enemy_bullet)                       
                     for enemy1 in enemies1:
@@ -424,38 +401,23 @@ def level1(clock, player):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()   
-                
-    
-#def main():
-    player = Player(player_img, player_down_img, player_pos)
-    enemies1 = pygame.sprite.Group()
-    enemies2 = pygame.sprite.Group()
-#bosses = pygame.sprite.Group()
-    awards = pygame.sprite.Group()
-# 存储被击毁的飞机，用来渲染击毁精灵动画
-    enemies1_down = pygame.sprite.Group()
-    enemies2_down = pygame.sprite.Group()
-    
-    shoot_enemy2_frequency = 10
-    shoot_frequency = 15
-    bomb_frequency = 15
-    bullet_number = 5
-    recharging = 0
-    enemy1_frequency = 1
-    enemy2_frequency = 1
-    enemy2_once_flag = 0  #表示出现过了，已经有enemy_bullet这个group了
-    boss_frequency = 1
-    award_frequency = 1
-    award_time = 100
-    boss_flag = 0
-    boss_down_flag = 0
-    boss_once_flag = 0
-    player_down_index = 0
-    
-    clock = pygame.time.Clock()
-    running = 1
-    myTime = 0
 
+def level2(clock, player):     
+    enemies1 = pygame.sprite.Group()  # enemy1的group
+    awards = pygame.sprite.Group()  # 奖励的group
+    enemies1_down = pygame.sprite.Group()  # 被击毁的就放入这个group中一起处理
+
+    award_frequency = 1
+    award_time = 100  # 第一个award出现
+    boss_flag = 0
+    boss1_down_flag = 0
+    boss2_down_flag = 0
+    boss_once_flag = 0
+    myTime = 0
+    running = 1
+    global myScore
+    global myGame
+    
     while running:
         # 控制游戏最大帧率为60
         clock.tick(60)
@@ -463,165 +425,73 @@ def level1(clock, player):
         screen.fill(0)
         screen.blit(background, (0, 0))
         
-        # 生成敌机
-        if boss_flag == 1:
-            if enemy1_frequency % 1000 == 0:  # 通过这个数字来确定出现的频率
+        if boss_flag == 0 and boss1_down_flag == 0 and boss2_down_flag == 0:
+            if myTime % (80 - int(myTime / 40)) == 0:  # 通过这个数字来确定出现的频率
                 enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
                 enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
-            enemy1_frequency += 1
-            if enemy1_frequency >= 101:
-                enemy1_frequency = 1
-        else:
-            if enemy1_frequency % 500 == 0:
-                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
-                enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
-                enemies1.add(enemy1)    
-            enemy1_frequency += 1
-            if enemy1_frequency >= 51:
-                enemy1_frequency = 1   
                 
-          # 生成第二种敌机, 第二种敌机只能一架一架出现，不然会有问题，我估计是加入到group中的时候
-          # 失去了类的一些特性。。。不重要，还是专心编写智能的boss吧          
-        if myTime > 2000: 
-            if boss_flag == 1:
-                if enemy2_frequency % 5000 == 0:
-                    enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
-                    enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
-                    enemies2.add(enemy2)  
-                    if enemy2_once_flag == 0:
-                        enemy2_once_flag = 1
-                enemy2_frequency += 1
-                if enemy2_frequency >= 501:
-                    enemy2_frequency = 1
-            else:
-                if enemy2_frequency % 3000 == 0:
-                    enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
-                    enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
-                    enemies2.add(enemy2)  
-                    if enemy2_once_flag == 0:
-                        enemy2_once_flag = 1
-                enemy2_frequency += 1
-                if enemy2_frequency >= 301:
-                    enemy2_frequency = 1   
-                
-        # 生成boss
-        # if boss_frequency % 100 == 0  and boss_flag == 0:
-            # boss = Boss_level1(boss_img, boss_down_img, boss_pos)
-            # if boss_once_flag == 0:
-                # boss_once_flag = 1
-            # boss_flag = 1
-            # boss_down_flag = 0
-            # boss_frequency = 1
-    
-        # if boss_flag == 1:
-            # if boss.flag_showup == 1:
-                # boss.move((player.rect.left + player.rect.right) / 2 - (boss.rect.left + boss.rect.right) / 2)
-                # if boss.bullet_number > 0:
-                    # if boss.shoot_frequency == 15:
-                        # boss.normal_shoot(bullet_enemy_img)
-                        # bullet_sound.play()
-                        # boss.shoot_frequency = 0
-                        # boss.bullet_number -= 1
-                    # else:
-                        # boss.shoot_frequency += 1
-                    # boss_img_index = boss.shoot_frequency // 8 + 1
-                    # screen.blit(boss_img[boss_img_index], boss.rect)
-                # else:
-                    # if boss.recharge == 0:
-                        # boss.bullet_number = 5;
-                        # boss.recharge = 200
-                    # else:
-                        # boss.recharge -= 1
-                    # screen.blit(boss_img[0], boss.rect)
-            # else:
-                # boss.show()
-                # if boss.flag_sound == 0:
-                    # boss_show_sound.play()
-                    # boss.flag_sound = 1
-                # screen.blit(boss_img[0], boss.rect)
-                
-            #和玩家相撞   
-            # if pygame.sprite.collide_rect(boss, player):
-                # player.is_hit = True
-                # game_over_sound.play()
-                # boss.life = 0
-                
-            # 发现没有合适的函数，要去看文档！！
-            # if pygame.sprite.spritecollideany(boss, player.bullets):
-                # boss.life -= 1
-                # player.bullets.remove(bullet) #要注意一旦击中就要删除子弹，不然下次循环还会把这颗子弹算上去
-              #  注意一开始player和boss的子弹都是bullet，然后就有问题了，remove不掉了，后来把boss的子弹名字改成enemy_bullet就OK了
-            # if boss.life <= 0:
-                # boss_flag = 0
-                # boss_down_flag = 1
-                # player.score += 300
-                # boss_down_sound.play()       
-                
-             #第二关 
-        if boss_frequency % 100 == 0  and boss_flag == 0:
+         #生成boss
+        if myTime == 200:
             boss1 = Boss_level1(boss_img, boss_down_img, boss_pos_left)
             boss2 = Boss_level2(boss_img, boss_down_img, boss_pos_right)
-            if boss_once_flag == 0:
-                boss_once_flag = 1
+            boss_once_flag = 1
             boss_flag = 1
-            boss_down_flag = 0
-            boss_frequency = 1
     
         if boss_flag == 1:
-            if boss1.flag_showup == 1:
-                boss1.move((player.rect.left + player.rect.right) / 2 - (boss.rect.left + boss.rect.right) / 2)
-                if boss1.bullet_number > 0:
+            if boss1.flag_showup == 1 and boss1_down_flag == 0:
+                boss1.move((player.rect.left + player.rect.right) / 2 - (boss1.rect.left + boss1.rect.right) / 2)
+                if boss1.bullet > 0:
                     if boss1.shoot_frequency == 15:
                         boss1.normal_shoot(bullet_enemy_img)
                         bullet_sound.play()
                         boss1.shoot_frequency = 0
-                        boss1.bullet_number -= 1
+                        boss1.bullet -= 1
                     else:
                         boss1.shoot_frequency += 1
                     boss1.index = boss1.shoot_frequency // 8 + 1
                     screen.blit(boss1.images[boss1.index], boss1.rect)
                 else:
                     if boss1.recharge == 0:
-                        boss1.bullet_number = 5;
+                        boss1.bullet = boss1.bullet_max;
                         boss1.recharge = 200
                     else:
                         boss1.recharge -= 1
                     screen.blit(boss1.images[0], boss1.rect)
-            else:
+            elif boss1.flag_showup == 0 and boss1_down_flag == 0:
                 boss1.show()
                 if boss1.flag_sound == 0:
                     boss_show_sound.play()
                     boss1.flag_sound = 1
                 screen.blit(boss1.images[0], boss1.rect)
-                # 第二架boss
-            if boss2.flag_showup == 1:
+                # boss2
+            if boss2.flag_showup == 1 and boss2_down_flag == 0:
                 boss2.move()
-                if boss2.bullet_number > 0:
+                if boss2.bullet > 0:
                     if boss2.shoot_frequency == 15:
                         boss2.normal_shoot(bullet_enemy_img)
                         bullet_sound.play()
                         boss2.shoot_frequency = 0
-                        boss2.bullet_number -= 1
+                        boss2.bullet -= 1
                     else:
                         boss2.shoot_frequency += 1
                     boss2.index = boss2.shoot_frequency // 8 + 1
                     screen.blit(boss2.images[boss2.index], boss2.rect)
                 else:
                     if boss2.recharge == 0:
-                        boss2.bullet_number = 5;
+                        boss2.bullet = boss2.bullet_max;
                         boss2.recharge = 200
                     else:
                         boss2.recharge -= 1
                     screen.blit(boss2.images[0], boss2.rect)
-            else:
+            elif boss2.flag_showup == 0 and boss2_down_flag == 0:
                 boss2.show()
                 if boss2.flag_sound == 0:
                     boss_show_sound.play()
                     boss2.flag_sound = 1
                 screen.blit(boss2.images[0], boss2.rect)
                 
-            # 和玩家相撞   
+            #boss和玩家相撞   
             if pygame.sprite.collide_rect(boss1, player):
                 player.is_hit = True
                 game_over_sound.play()
@@ -629,36 +499,109 @@ def level1(clock, player):
             if pygame.sprite.collide_rect(boss2, player):
                 player.is_hit = True
                 game_over_sound.play()
-                boss2.life = 0
+                boss2.life = 0         
                 
-    #     attack = pygame.sprite.spritecollideany(boss, player.bullets) # 发现没有合适的函数，要去看文档！！
+            #发现没有合适的函数，要去看文档！！
             if pygame.sprite.spritecollideany(boss1, player.bullets):
-            #if pygame.sprite.collide_circle(boss, player.bullets):
-                boss1.life -= 1
+                if boss1.flag_showup == 1:
+                    boss1.life -= 1
                 player.bullets.remove(bullet) #要注意一旦击中就要删除子弹，不然下次循环还会把这颗子弹算上去
-                # 注意一开始player和boss的子弹都是bullet，然后就有问题了，remove不掉了，后来把boss的子弹名字改成enemy_bullet就OK了
-            if boss1.life <= 0:
-                if boss2.life <= 0:
-                    boss_flag = 0
-                boss_down_flag = 1
-                player.score += 300
-                boss_down_sound.play() 
-                
+                #注意一开始player和boss的子弹都是bullet，然后就有问题了，remove不掉了，后来把boss的子弹名字改成enemy_bullet就OK了
             if pygame.sprite.spritecollideany(boss2, player.bullets):
-            #if pygame.sprite.collide_circle(boss, player.bullets):
-                boss2.life -= 1
-                player.bullets.remove(bullet) #要注意一旦击中就要删除子弹，不然下次循环还会把这颗子弹算上去
-                # 注意一开始player和boss的子弹都是bullet，然后就有问题了，remove不掉了，后来把boss的子弹名字改成enemy_bullet就OK了
-            if boss2.life <= 0:
-                if boss1.life <= 0:
-                    boss_flag = 0
-                boss_down_flag = 1
-                player.score += 300
-                boss_down_sound.play()       
+                if boss2.flag_showup == 1:
+                    boss2.life -= 1
+                player.bullets.remove(bullet)
                 
-        else:
-            boss_frequency += 1
+            if boss1.life <= 0:
+                if boss1_down_flag == 0:
+                    player.score += 300
+                    boss1_down_flag = 1
+                    boss_down_sound.play() 
+            if boss2.life <= 0:
+                if boss2_down_flag == 0: 
+                    player.score += 300
+                    boss2_down_flag = 1
+                    boss_down_sound.play() 
+            if (boss1_down_flag == 1 or boss1_down_flag == 2) and (boss2_down_flag == 1 or boss2_down_flag == 2):
+                boss_flag = 0
+                
+        enemies1_shot = pygame.sprite.groupcollide(enemies1, player.bullets, 1, 1)
+        for enemy1_down in enemies1_shot:
+            enemies1_down.add(enemy1_down) 
             
+        # 移动子弹，若超出窗口范围则删除
+        for bullet in player.bullets:
+            bullet.move()
+            if bullet.rect.bottom < 0:
+                player.bullets.remove(bullet)
+        if boss_once_flag == 1:
+            for enemy_bullet in boss1.enemy_bullets:
+                enemy_bullet.move()
+                if enemy_bullet.rect.bottom > SCREEN_HEIGHT:
+                    boss1.enemy_bullets.remove(enemy_bullet)   
+            for enemy_bullet in boss2.enemy_bullets:
+                enemy_bullet.move()
+                if enemy_bullet.rect.bottom > SCREEN_HEIGHT:
+                    boss2.enemy_bullets.remove(enemy_bullet)   
+                    
+        # 移动敌机，若超出窗口范围则删除
+        for enemy1 in enemies1:
+            enemy1.move()
+            # 判断玩家是否被击中
+            if pygame.sprite.collide_rect(enemy1, player):
+                enemies1_down.add(enemy1)
+                enemies1.remove(enemy1)
+                player.is_hit = True
+                game_over_sound.play()
+                break
+            if enemy1.rect.top > SCREEN_HEIGHT:
+                enemies1.remove(enemy1)   
+
+        if boss_once_flag == 1:
+            if pygame.sprite.spritecollideany(player, boss1.enemy_bullets) :
+                boss1.enemy_bullets.remove(enemy_bullet)
+                player.is_hit = True
+                game_over_sound.play()
+            boss1.enemy_bullets.draw(screen)   
+            if pygame.sprite.spritecollideany(player, boss2.enemy_bullets) :
+                boss2.enemy_bullets.remove(enemy_bullet)
+                player.is_hit = True
+                game_over_sound.play()
+            boss2.enemy_bullets.draw(screen)   
+            
+    # 绘制敌机和boss击毁动画
+        for enemy1_down in enemies1_down:
+            if enemy1_down.down_index == 0:
+                enemy_down_sound.play()
+            if enemy1_down.down_index > 7:
+                enemies1_down.remove(enemy1_down)
+                player.score += 10
+                continue
+            screen.blit(enemy1_down.down_imgs[enemy1_down.down_index // 2], enemy1_down.rect)
+            enemy1_down.down_index += 1     
+ 
+        if boss1_down_flag == 1:
+            img_index1 = boss1.down_index // 10
+            screen.blit(boss1.down_images[img_index1], boss1.rect)
+            boss1.down_index += 1
+            if boss1.down_index == 59:
+                boss1_down_flag = 2
+                if boss_flag == 0:
+                    running = 0
+                    myGame = 1
+                    myScore = player.score
+                
+        if boss2_down_flag == 1:
+            img_index2 = boss2.down_index // 10
+            screen.blit(boss2.down_images[img_index2], boss2.rect)
+            boss2.down_index += 1
+            if boss2.down_index == 59:
+                boss2_down_flag = 2
+                if boss_flag == 0:
+                    running = 0
+                    myGame = 1
+                    myScore = player.score
+              
         # 生成奖励
         if award_frequency == award_time:
             type = random.randint(0, 20)
@@ -680,17 +623,281 @@ def level1(clock, player):
         for award in awards:
             award.move()
                 #是否获得奖励
-            if pygame.sprite.collide_circle(player, award):
+            if pygame.sprite.collide_rect(player, award):
                 if award.kind == 1:
                     player.NL_bullet_time = 400
                     get_double_bullet_sound.play()
                 else:
-                    player.bomb += 1
-                    get_bomb_sound.play()
+                    if player.bomb < player.bomb_max:
+                        player.bomb += 1
+                        get_bomb_sound.play()
                 awards.remove(award)
             
             if award.rect.bottom > 700:
                 awards.remove(award)
+                
+# 绘制玩家飞机
+        if not player.is_hit:
+            screen.blit(player.image[player.index], player.rect)
+            # 更换图片索引使飞机有动画效果
+            player.index = player.shoot_frequency // 8  # 注意这里有一个射子弹喷火的小动画，所以子弹频率设成了15
+        else:  
+            player.index = player.down_index // 8 #用这种准循环来实现玩家飞机爆炸的效果
+            screen.blit(player.down_imgs[player.index], player.rect)
+            player.down_index += 1
+            if player.down_index > 31:
+                running = 0  # 效果结束后这个循环就结束了
+                myGame = 0
+                myScore = player.score
+                
+ # 绘制子弹和和奖励和敌机
+        player.bullets.draw(screen)
+        awards.draw(screen)
+        enemies1.draw(screen)
+            
+        # 绘制得分
+        score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+        score_text = score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
+        text_rect = score_text.get_rect()
+        text_rect.topleft = [10, 5]
+        screen.blit(score_text, text_rect)
+        # 绘制boss血量
+        if boss_flag == 1 and boss1_down_flag == 0:
+            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            strbosslife = ''
+            for i in range(0, boss1.life):
+                strbosslife += '[]'
+            boss_life_text = boss_life_font.render('Boss1 level2: ' + strbosslife, True, (128, 128, 128))
+            boss_life_rect = boss_life_text.get_rect()
+            boss_life_rect.topleft = [30, SCREEN_HEIGHT - 70]
+            screen.blit(boss_life_text, boss_life_rect)
+            
+        if boss_flag == 1 and boss2_down_flag == 0:
+            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            strbosslife = ''
+            for i in range(0, boss2.life):
+                strbosslife += '[]'
+            boss_life_text = boss_life_font.render('Boss2 level2: ' + strbosslife, True, (128, 128, 128))
+            boss_life_rect = boss_life_text.get_rect()
+            boss_life_rect.topleft = [30, SCREEN_HEIGHT - 40]
+            screen.blit(boss_life_text, boss_life_rect)       
+            
+        # 绘制子弹数目和bomb数目
+        bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+        if player.NL_bullet_time > 0:
+            bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
+        else:
+            if player.bullet > 0:
+                bullet_text = bullet_font.render('Bullet: ' , True, (128, 128, 128))
+                position = SCREEN_WIDTH - 65
+                for i in range(0, player.bullet):
+                    screen.blit(bullet_img, ((position + i * 12), 10))
+            else:
+                bullet_text = bullet_font.render('Recharging...' , True, (128, 128, 128))
+        bulletText_rect = bullet_text.get_rect()
+        bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定bullet的位置
+        screen.blit(bullet_text, bulletText_rect)
+        bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+        bomb_text = bomb_font.render('Bomb x ' + str(player.bomb), True, (128, 128, 128))
+        bombText_rect = bomb_text.get_rect()
+        bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
+        screen.blit(bomb_text, bombText_rect)
+        
+        # 监听键盘事件
+        key_pressed = pygame.key.get_pressed()
+        # 若玩家被击中，则无效
+        if not player.is_hit:
+            if key_pressed[K_SPACE]:
+                if player.shoot_frequency % 15 == 0 and (player.bullet > 0 or player.NL_bullet_time > 0):
+                    bullet_sound.play()
+                    player.shoot(bullet_img)
+                    player.shoot_frequency = 0
+                    player.bullet -= 1
+                    #使用炸弹
+            if key_pressed[K_b]:
+                if player.bomb_frequency % 15 == 0 and player.bomb > 0:
+                    bomb_sound.play()
+                    player.bomb -= 1
+                    player.bomb_frequency = 0
+                    if boss_flag == 1:
+                        boss1.life -= boss1.bomb_damage
+                        boss2.life -= boss2.bomb_damage
+                        for enemy_bullet in boss1.enemy_bullets:
+                            boss1.enemy_bullets.remove(enemy_bullet)  
+                        for enemy_bullet in boss2.enemy_bullets:
+                            boss2.enemy_bullets.remove(enemy_bullet)                                   
+                    for enemy1 in enemies1:
+                        enemies1_down.add(enemy1)
+                        enemies1.remove(enemy1)
+                        
+            if key_pressed[K_w] or key_pressed[K_UP]:
+                player.moveUp()
+            if key_pressed[K_s] or key_pressed[K_DOWN]:
+                player.moveDown()
+            if key_pressed[K_a] or key_pressed[K_LEFT]:
+                player.moveLeft()
+            if key_pressed[K_d] or key_pressed[K_RIGHT]:
+                player.moveRight()
+            
+        if player.shoot_frequency < 15:  # 现在飞机射子弹的频率下来了
+            player.shoot_frequency += 1
+        if player.bomb_frequency < 15:
+            player.bomb_frequency += 1
+            #recharge the bullets
+        if player.recharging < player.recharge_time and player.bullet < player.bullet_max:
+            player.recharging += 1
+            if player.recharging == player.recharge_time:
+                player.bullet += 1
+                player.recharging = 0
+        player.NL_bullet_time -= 1
+        if player.NL_bullet_time == 0:
+            player.bullet = player.bullet_max
+                
+        # 更新屏幕
+        pygame.display.update()
+        myTime += 1
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()      
+
+def level3(clock, player):
+    enemies1 = pygame.sprite.Group()  # enemy1的group
+    enemies2 = pygame.sprite.Group()  # enemy2的group
+    awards = pygame.sprite.Group()  # 奖励的group
+    enemies1_down = pygame.sprite.Group()  # 被击毁的就放入这个group中一起处理
+    enemies2_down = pygame.sprite.Group()
+    enemy2_once_flag = 0
+    award_frequency = 1
+    award_time = 100  # 第一个award出现
+    boss_flag = 0
+    boss_down_flag = 0
+    boss_once_flag = 0
+    myTime = 0
+    running = 1
+    begin = 1
+    global myScore 
+    global myGame
+    
+    while running:
+        # 控制游戏最大帧率为60
+        clock.tick(60)
+        # 绘制背景
+        screen.fill(0)
+        screen.blit(background, (0, 0))
+        # 生成两种敌人
+        if boss_flag == 0 and boss_down_flag == 0:
+            if myTime % (100 - int(myTime / 40)) == 0:  # 通过这个数字来确定出现的频率
+                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+                enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
+                enemies1.add(enemy1)    
+                
+        if boss_flag == 0 and boss_down_flag == 0:
+            if myTime % 2000 == 0:  # 通过这个数字来确定出现的频率
+                enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
+                enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
+                enemies2.add(enemy2)
+                if enemy2_once_flag == 0:
+                    enemy2_once_flag = 1
+                
+         #生成boss
+        if myTime == 200:
+            boss = Boss_level3(boss_img, boss_down_img, boss_pos)
+            boss_once_flag = 1
+            boss_flag = 1
+    
+        if boss_flag == 1:
+            if boss.flag_showup == 1:
+                target = (player.rect.left + player.rect.right) / 2 - (boss.rect.left + boss.rect.right) / 2
+                playerleft = list(player.rect.topleft)
+                playerright = list(player.rect.topright)
+                positionx = (playerleft[0] + playerright[0]) / 2
+                positiony = playerleft[1]
+                # print positiony
+                if begin == 1:
+                    if positionx > 300 and positionx < 500:
+                        boss.teleportation_defence(positionx)
+                    begin = 0
+                if boss.bullet > 6 and boss.mode == 0:
+                    boss.mode = 1
+                    boss.ishit_flag = 0
+                elif boss.bullet < 3 and boss.mode == 1:
+                    boss.mode = 0  
+                    #瞬间移动
+                if boss.ishit_flag == 1 and boss.mode == 0 and boss.teleportation == 0:
+                    boss.teleportation_defence(positionx)
+                    boss.ishit_flag = 0
+                    boss.teleportation = boss.teleportation_recharge
+                elif boss.mode == 1 and abs(target) > 200 and boss.teleportation == 0 and positiony < 350:
+                    boss.teleportation_attack(positionx)
+                    boss.teleportation = boss.teleportation_recharge
+                    
+                if boss.teleportation > 0:
+                    boss.teleportation -= 1
+                if boss.ishit_flag == 1:
+                    boss.ishit_flag = 0  # 只是那一下才会触发，之后就没有ishit的flag了
+                    
+                boss.move(target, boss.mode)
+                
+                if boss.bullet > 0 and abs(target) < 100:
+                    if boss.shoot_frequency == 15:
+                        boss.normal_shoot(bullet_enemy_img)
+                        bullet_sound.play()
+                        boss.shoot_frequency = 0
+                        boss.bullet -= 1
+                    else:
+                        boss.shoot_frequency += 1
+                    boss.index = boss.shoot_frequency // 8 + 1
+                    screen.blit(boss.images[boss.index], boss.rect)
+                    
+                if boss.bullet < boss.bullet_max:
+                    if boss.recharging == 0:
+                        boss.bullet += 1
+                        boss.recharging = boss.recharge_time
+                    else:
+                        boss.recharging -= 1
+                screen.blit(boss.images[0], boss.rect)
+            else:
+                boss.show()
+                if boss.flag_sound == 0:
+                    boss_show_sound.play()
+                    boss.flag_sound = 1
+                screen.blit(boss.images[0], boss.rect)
+                
+            #boss和玩家相撞   
+            if pygame.sprite.collide_rect(boss, player):
+                player.is_hit = True
+                game_over_sound.play()
+                boss.life = 0
+                
+            #发现没有合适的函数，要去看文档！！
+            if pygame.sprite.spritecollideany(boss, player.bullets):
+                if boss.flag_showup == 1:
+                    boss.life -= 1
+                    boss.ishit_flag = 1
+                player.bullets.remove(bullet) #要注意一旦击中就要删除子弹，不然下次循环还会把这颗子弹算上去
+                #注意一开始player和boss的子弹都是bullet，然后就有问题了，remove不掉了，后来把boss的子弹名字改成enemy_bullet就OK了
+            if boss.life <= 0:
+                boss_flag = 0
+                boss_down_flag = 1
+                player.score += 600
+                boss_down_sound.play() 
+                
+        if boss_once_flag == 1:
+            if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
+                boss.enemy_bullets.remove(enemy_bullet)
+                player.is_hit = True
+                game_over_sound.play()
+            boss.enemy_bullets.draw(screen)   
+                            
+        enemies1_shot = pygame.sprite.groupcollide(enemies1, player.bullets, 1, 1)
+        for enemy1_down in enemies1_shot:
+            enemies1_down.add(enemy1_down) 
+            
+        enemies2_shot = pygame.sprite.groupcollide(enemies2, player.bullets, 1, 1)
+        for enemy2_down in enemies2_shot:
+            enemies2_down.add(enemy2_down)          
             
         # 移动子弹，若超出窗口范围则删除
         for bullet in player.bullets:
@@ -719,8 +926,8 @@ def level1(clock, player):
                 game_over_sound.play()
                 break
             if enemy1.rect.top > SCREEN_HEIGHT:
-                enemies1.remove(enemy1)    
-                
+                enemies1.remove(enemy1)   
+
         for enemy2 in enemies2:
             enemy2.move((player.rect.left + player.rect.right) / 2 - (enemy2.rect.left + enemy2.rect.right) / 2)
             if enemy2.shoot_frequency == enemy2.recharge_time:
@@ -734,7 +941,6 @@ def level1(clock, player):
             else:
                 enemy2.img_index = 0
             screen.blit(enemy2.images[enemy2.img_index], enemy2.rect)
-            
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy2, player):
                 enemies2_down.add(enemy2)
@@ -743,52 +949,16 @@ def level1(clock, player):
                 game_over_sound.play()
                 break
             if enemy2.rect.top > SCREEN_HEIGHT:
-                enemies2.remove(enemy2)      
-                
-        if boss_down_flag == 1:
-            img_index = boss.down_index // 10
-            screen.blit(boss_down_img[img_index], boss.rect)
-            boss.down_index += 1
-            if boss.down_index == 59:
-                boss_down_flag = 0
-        
-        if boss_once_flag == 1:
-            if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
-                boss.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
-            boss.enemy_bullets.draw(screen)   
+                enemies2.remove(enemy2)   
 
         if enemy2_once_flag == 1:
             if pygame.sprite.spritecollideany(player, enemy2.enemy_bullets) :
                 enemy2.enemy_bullets.remove(enemy_bullet)
                 player.is_hit = True
                 game_over_sound.play()
-            enemy2.enemy_bullets.draw(screen)   
+            enemy2.enemy_bullets.draw(screen)             
             
-        # 绘制玩家飞机
-        if not player.is_hit:
-            screen.blit(player.image[player.img_index], player.rect)
-            # 更换图片索引使飞机有动画效果
-            player.img_index = shoot_frequency // 8  # 注意这里有一个射子弹喷火的小动画，所以子弹频率设成了15
-        else:
-            global myScore 
-            myScore = player.score
-            player.img_index = player_down_index // 8 #用这种准循环来实现玩家飞机爆炸的效果
-            screen.blit(player.down_imgs[player.img_index], player.rect)
-            player_down_index += 1
-            if player_down_index > 31:
-                running = 0  # 效果结束后这个循环就结束了
-                
-    # 将被击中的敌机对象添加到击毁敌机Group中，用来渲染击毁动画
-        enemies1_shot = pygame.sprite.groupcollide(enemies1, player.bullets, 1, 1)
-        for enemy1_down in enemies1_shot:
-            enemies1_down.add(enemy1_down)
-        enemies2_shot = pygame.sprite.groupcollide(enemies2, player.bullets, 1, 1)
-        for enemy2_down in enemies2_shot:
-            enemies2_down.add(enemy2_down)    
-            
-        # 绘制击毁动画
+    # 绘制敌机和boss击毁动画
         for enemy1_down in enemies1_down:
             if enemy1_down.down_index == 0:
                 enemy_down_sound.play()
@@ -797,8 +967,8 @@ def level1(clock, player):
                 player.score += 10
                 continue
             screen.blit(enemy1_down.down_imgs[enemy1_down.down_index // 2], enemy1_down.rect)
-            enemy1_down.down_index += 1
-            
+            enemy1_down.down_index += 1     
+ 
         for enemy2_down in enemies2_down:
             if enemy2_down.down_index == 0:
                 enemy_down_sound.play()
@@ -809,31 +979,100 @@ def level1(clock, player):
             screen.blit(enemy2_down.down_imgs[enemy2_down.down_index // 2], enemy2_down.rect)
             enemy2_down.down_index += 1    
             
-        # 绘制子弹和和奖励和敌机
+        if boss_down_flag == 1:
+            img_index = boss.down_index // 10
+            screen.blit(boss_down_img[img_index], boss.rect)
+            boss.down_index += 1
+            if boss.down_index == 59:
+                boss_down_flag = 0
+                running = 0
+                myGame = 1
+                myScore = player.score
+
+        # 生成奖励
+        if award_frequency == award_time:
+            type = random.randint(0, 20)
+            if type < 15:
+                position = [random.randint(0, SCREEN_WIDTH - double_bullet_rect.width), 0]
+                award = Award(double_bullet_img, double_bullet_effect, position)
+                award.kind = 1
+            else:
+                position = [random.randint(0, SCREEN_WIDTH - bomb_rect.width), 0]
+                award = Award(bomb_img, bomb_effect, position)
+                award.kind = 2
+                
+            awards.add(award)
+            award_frequency = 1
+            award_time = random.randint(300,600)
+        else:
+            award_frequency += 1
+            
+        for award in awards:
+            award.move()
+                #是否获得奖励
+            if pygame.sprite.collide_rect(player, award):
+                if award.kind == 1:
+                    player.NL_bullet_time = 400
+                    get_double_bullet_sound.play()
+                else:
+                    if player.bomb < player.bomb_max:
+                        player.bomb += 1
+                        get_bomb_sound.play()
+                awards.remove(award)
+            
+            if award.rect.bottom > 700:
+                awards.remove(award)
+                
+# 绘制玩家飞机
+        if not player.is_hit:
+            screen.blit(player.image[player.index], player.rect)
+            # 更换图片索引使飞机有动画效果
+            player.index = player.shoot_frequency // 8  # 注意这里有一个射子弹喷火的小动画，所以子弹频率设成了15
+        else:  
+            player.index = player.down_index // 8 #用这种准循环来实现玩家飞机爆炸的效果
+            screen.blit(player.down_imgs[player.index], player.rect)
+            player.down_index += 1
+            if player.down_index > 31:
+                running = 0  # 效果结束后这个循环就结束了
+                myGame = 0
+                myScore = player.score
+                
+ # 绘制子弹和和奖励和敌机
         player.bullets.draw(screen)
         awards.draw(screen)
         enemies1.draw(screen)
             
         # 绘制得分
-        player.score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
-        player.score_text = player.score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
-        text_rect = player.score_text.get_rect()
+        score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+        score_text = score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
+        text_rect = score_text.get_rect()
         text_rect.topleft = [10, 5]
-        screen.blit(player.score_text, text_rect)
+        screen.blit(score_text, text_rect)
+        # 绘制boss血量
+        if boss_flag == 1 and boss_down_flag == 0:
+            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            strbosslife = ''
+            for i in range(0, boss.life):
+                strbosslife += '[]'
+            boss_life_text = boss_life_font.render('Boss level3: ' + strbosslife, True, (128, 128, 128))
+            boss_life_rect = boss_life_text.get_rect()
+            boss_life_rect.topleft = [30, SCREEN_HEIGHT - 40]
+            screen.blit(boss_life_text, boss_life_rect)
+                
         # 绘制子弹数目和bomb数目
         bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
             bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
         else:
-            if bullet_number > 0:
+            if player.bullet > 0:
                 bullet_text = bullet_font.render('Bullet: ' , True, (128, 128, 128))
                 position = SCREEN_WIDTH - 65
-                for i in range(0, bullet_number):
+                for i in range(0, player.bullet):
                     screen.blit(bullet_img, ((position + i * 12), 10))
             else:
                 bullet_text = bullet_font.render('Recharging...' , True, (128, 128, 128))
         bulletText_rect = bullet_text.get_rect()
-        bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定位置
+        bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定bullet的位置
         screen.blit(bullet_text, bulletText_rect)
         bomb_font = pygame.font.Font('freesansbold.ttf', 20)
         bomb_text = bomb_font.render('Bomb x ' + str(player.bomb), True, (128, 128, 128))
@@ -846,31 +1085,31 @@ def level1(clock, player):
         # 若玩家被击中，则无效
         if not player.is_hit:
             if key_pressed[K_SPACE]:
-                if shoot_frequency % 15 == 0 and (bullet_number > 0 or player.NL_bullet_time > 0):
+                if player.shoot_frequency % 15 == 0 and (player.bullet > 0 or player.NL_bullet_time > 0):
                     bullet_sound.play()
                     player.shoot(bullet_img)
-                    shoot_frequency = 0
-                    bullet_number -= 1
+                    player.shoot_frequency = 0
+                    player.bullet -= 1
                     #使用炸弹
             if key_pressed[K_b]:
-                if bomb_frequency % 15 == 0 and player.bomb > 0:
+                if player.bomb_frequency % 15 == 0 and player.bomb > 0:
                     bomb_sound.play()
                     player.bomb -= 1
-                    bomb_frequency = 0
+                    player.bomb_frequency = 0
                     if boss_flag == 1:
-                        boss.life -= 8
+                        boss.life -= boss.bomb_damage
                         for enemy_bullet in boss.enemy_bullets:
-                            boss.enemy_bullets.remove(enemy_bullet)
+                            boss.enemy_bullets.remove(enemy_bullet)                       
+                    for enemy1 in enemies1:
+                        enemies1_down.add(enemy1)
+                        enemies1.remove(enemy1)
                     if enemy2_once_flag == 1:          
                         for enemy_bullet in enemy2.enemy_bullets:
                             enemy2.enemy_bullets.remove(enemy_bullet)    
                         for enemy2 in enemies2:
                             enemies2_down.add(enemy2)
-                            enemies2.remove(enemy2)                            
-                    for enemy1 in enemies1:
-                        enemies1_down.add(enemy1)
-                        enemies1.remove(enemy1)
-                        
+                            enemies2.remove(enemy2)     
+                            
             if key_pressed[K_w] or key_pressed[K_UP]:
                 player.moveUp()
             if key_pressed[K_s] or key_pressed[K_DOWN]:
@@ -880,19 +1119,19 @@ def level1(clock, player):
             if key_pressed[K_d] or key_pressed[K_RIGHT]:
                 player.moveRight()
             
-        if shoot_frequency < 15:  # 现在飞机射子弹的频率下来了
-            shoot_frequency += 1
-        if bomb_frequency < 15:
-            bomb_frequency += 1
+        if player.shoot_frequency < 15:  # 现在飞机射子弹的频率下来了
+            player.shoot_frequency += 1
+        if player.bomb_frequency < 15:
+            player.bomb_frequency += 1
             #recharge the bullets
-        if recharging < player.recharge_time and bullet_number < 5:
-            recharging += 1
-            if recharging == player.recharge_time:
-                bullet_number += 1
-                recharging = 0
+        if player.recharging < player.recharge_time and player.bullet < player.bullet_max:
+            player.recharging += 1
+            if player.recharging == player.recharge_time:
+                player.bullet += 1
+                player.recharging = 0
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
-            bullet_number = 5
+            player.bullet = player.bullet_max
                 
         # 更新屏幕
         pygame.display.update()
@@ -901,15 +1140,8 @@ def level1(clock, player):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()  
-
-def main(): 
-    player = Player(player_img, player_down_img, player_pos)
-    clock = pygame.time.Clock()
-    
-    level1(clock, player)
-
-    
+                exit()    
+                
 def over():
     clock = pygame.time.Clock()
     myX = [-3, 3, -3, 3]
@@ -929,7 +1161,7 @@ def over():
         screen.blit(gameover, (0, 0))
         
         font = pygame.font.Font('freesansbold.ttf', 48)
-        scoreText = font.render('Score: '+ str(score), True, (100, 0, 0))
+        scoreText = font.render('Score: '+ str(myScore), True, (100, 0, 0))
         scoreText_rect = scoreText.get_rect()
         scoreText_rect.centerx = screen.get_rect().centerx
         scoreText_rect.centery = screen.get_rect().centery + 24  # 这两句是用来调整player.score的位置的，现在是x轴上在
@@ -1079,18 +1311,22 @@ def opening():
                 if poslist[0] > 280 and poslist[0] < 520 and poslist[1] > 330 and poslist[1] < 370:
                     running = 0
         pygame.display.update()
- 
+
+def main(): 
+    player = Player(player_img, player_down_img, player_pos)
+    clock = pygame.time.Clock()
+    
+    # level1(clock, player)
+    # if myGame == 1:
+        # level2(clock, player)
+        # if myGame == 1:
+            # level3(clock, player)
+    level3(clock, player)
+    
 if __name__ == '__main__': 
-    # app = wx.App(redirect = False)
-    # frame = myFrame()
-    # frame.Show(True)
     opening()
-    while 1:     
-        score = 0
+    while 1:    
         main()
         over()
-
-    
-    
-    
-    
+        
+        
