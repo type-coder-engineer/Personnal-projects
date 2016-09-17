@@ -65,7 +65,7 @@ class BuildExe:
         self.project_description = "A small project to let myself and my friends to have fun"
  
         #Icon file (None will use pygame default icon)
-        self.icon_file = None
+        self.icon_file = 'plane.ico'
  
         #Extra files/dirs copied to game
         self.extra_datas = []
@@ -75,7 +75,9 @@ class BuildExe:
         self.exclude_modules = []
         
         #DLL Excludes
-        self.exclude_dll = ['MSVCP90.dll', 'numpy-atlas.dll']
+        self.exclude_dll = ['MSVCP90.dll', 'numpy-atlas.dll', 'KERNEL32.dll', 'OLEAUT32.dll', \
+        'USER32.dll', 'IMM32.dll', 'SHELL32.dll', 'COMDLG32.dll', \
+        'COMCTL32.dll', 'ADVAPI32.dll', 'WS2_32.dll', 'GDI32.dll', 'WINMM.dll', 'ole32.dll']
         #python scripts (strings) to be included, seperated by a comma
         self.extra_scripts = []
  
@@ -83,7 +85,7 @@ class BuildExe:
         self.zipfile_name = None
  
         #Dist directory
-        self.dist_dir = 'shooting'
+        self.dist_dir = 'dist'
  
     # Code from DistUtils tutorial at http://wiki.python.org/moin/Distutils/Tutorial
     # Originally borrowed from wxPython's setup and config files
@@ -149,7 +151,7 @@ class BuildExe:
             # targets to build
             windows = [{
                 'script': self.script,
-                'icon_resources': [(0, self.icon_file)],
+                'icon_resources': [(1, "myPlane.ico")],
                 'copyright': self.copyright
             }],
             options = {'py2exe': {'optimize': 2, 'bundle_files': 1, 'compressed': True, \
