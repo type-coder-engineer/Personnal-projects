@@ -509,6 +509,8 @@ class Boss_level5(Enemy1):
         self.shoot_flag = 0
         self.summon_recharge = 1000
         self.summon = 0
+        self.enemy1 = 90
+        self.enemy1_recharge = 1000
         self.flag_showup = 0
         self.rect.bottomleft = init_pos
         
@@ -542,12 +544,12 @@ class Boss_level5(Enemy1):
     def move(self, target, mode):
         if mode == 1 or mode == 2:
             if target > 4: 
-                if self.rect.right >= SCREEN_WIDTH:
+                if self.rect.right >= (SCREEN_WIDTH - 5):
                     pass
                 else:
                     self.rect.right += self.speed                
             if target < -4:
-                if self.rect.left  <= 0:
+                if self.rect.left <= 5:
                     pass
                 else:
                     self.rect.left -= self.speed                          
@@ -557,12 +559,12 @@ class Boss_level5(Enemy1):
                 pass
         else:
             if target > 4: 
-                if self.rect.left  <= 0:
+                if self.rect.left  <= 5:
                     pass
                 else:
                     self.rect.left -= self.speed                     
             if target < -4:
-                if self.rect.right >= SCREEN_WIDTH:
+                if self.rect.right >= (SCREEN_WIDTH - 5):
                     pass
                 else:
                     self.rect.right += self.speed        

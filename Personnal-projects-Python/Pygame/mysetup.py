@@ -1,14 +1,12 @@
+# -*- coding: utf-8 -*-
 # This will create a dist directory containing the executable file, all the data
 # directories. All Libraries will be bundled in executable file.
-#
-# Run the build process by entering 'pygame2exe.py' or
-# 'python pygame2exe.py' in a console prompt.
-#
+
 # To build exe, python, pygame, and py2exe have to be installed. After
 # building exe none of this libraries are needed.
 #Please Note have a backup file in a different directory as if it crashes you 
 #will loose it all!(I lost 6 months of work because I did not do this)
- 
+# 在终端中运行 python mysetup.py 即可 
  
 try:
     from distutils.core import setup
@@ -42,7 +40,7 @@ class pygame2exe(py2exe.build_exe.py2exe): #This hack make sure that pygame defa
 class BuildExe:
     def __init__(self):
         #Name of starting .py
-        self.script = "mainGame.py"
+        self.script = "main.py"
  
         #Name of program
         self.project_name = "ShootingPlanes"
@@ -62,22 +60,24 @@ class BuildExe:
         self.copyright = "Copyright (c) 2016 Me."
  
         #Description
-        self.project_description = "A small project to let myself and my friends to have fun"
+        self.project_description = "A small project to let me and my friends to have fun"
  
         #Icon file (None will use pygame default icon)
-        self.icon_file = 'plane.ico'
+        self.icon_file = 'myPlane.ico'
  
         #Extra files/dirs copied to game
         self.extra_datas = []
  
         #Extra/excludes python modules
         self.extra_modules = []
-        self.exclude_modules = []
+        self.exclude_modules = ['AppKit', 'Carbon', 'Carbon.Files', 'Foundation', 'Numeric', 'OpenGL.GL', '__svn_version__', '_curses', '_imp', '_scproxy', '_sysconfigdata', 'backports.ssl_match_hostname', 'builtins', 'code_generators.genapi', 'code_generators.numpy_api', 'compat.long', 'configparser', 'copyreg', 'core.abs', 'core.max', 'core.min', 'core.round', 'dummy.Process', 'fcompiler.FCompiler', 'fcompiler.has_f90_header', 'fcompiler.is_f_file', 'genapi', 'html.entities', 'http.client', 'http.server', 'importlib.machinery', 'nose', 'nose.plugins', 'nose.plugins.base', 'nose.plugins.builtin', 'nose.plugins.errorclass', 'nose.util', 'numarray', 'numpy._build_utils.apple_accelerate', 'numpy.amax', 'numpy.amin', 'numpy.array', 'numpy.bool_', 'numpy.compat.asbytes', 'numpy.compat.asbytes_nested', 'numpy.compat.asstr', 'numpy.compat.basestring', 'numpy.compat.bytes', 'numpy.compat.integer_types', 'numpy.compat.isfileobj', 'numpy.compat.long', 'numpy.compat.open_latin1', 'numpy.compat.sixu', 'numpy.compat.unicode', 'numpy.core.Inf', 'numpy.core.absolute', 'numpy.core.add', 'numpy.core.all', 'numpy.core.amax', 'numpy.core.amin', 'numpy.core.any', 'numpy.core.arange', 'numpy.core.around', 'numpy.core.array', 'numpy.core.array_repr', 'numpy.core.asanyarray', 'numpy.core.asarray', 'numpy.core.atleast_1d', 'numpy.core.atleast_2d', 'numpy.core.atleast_3d', 'numpy.core.bitwise_and', 'numpy.core.bitwise_or', 'numpy.core.bitwise_xor', 'numpy.core.broadcast', 'numpy.core.cdouble', 'numpy.core.complexfloating', 'numpy.core.concatenate', 'numpy.core.conjugate', 'numpy.core.csingle', 'numpy.core.divide', 'numpy.core.dot', 'numpy.core.double', 'numpy.core.empty', 'numpy.core.empty_like', 'numpy.core.equal', 'numpy.core.errstate', 'numpy.core.fastCopyAndTranspose', 'numpy.core.finfo', 'numpy.core.float32', 'numpy.core.float64', 'numpy.core.float_', 'numpy.core.geterrobj', 'numpy.core.greater', 'numpy.core.greater_equal', 'numpy.core.hstack', 'numpy.core.iinfo', 'numpy.core.inexact', 'numpy.core.inf', 'numpy.core.intc', 'numpy.core.integer', 'numpy.core.intp', 'numpy.core.invert', 'numpy.core.isfinite', 'numpy.core.isinf', 'numpy.core.isnan', 'numpy.core.isscalar', 'numpy.core.left_shift', 'numpy.core.less', 'numpy.core.less_equal', 'numpy.core.linspace', 'numpy.core.longdouble', 'numpy.core.maximum', 'numpy.core.multiply', 'numpy.core.ndarray', 'numpy.core.newaxis', 'numpy.core.not_equal', 'numpy.core.number', 'numpy.core.object_', 'numpy.core.ones', 'numpy.core.power', 'numpy.core.product', 'numpy.core.ravel', 'numpy.core.remainder', 'numpy.core.reshape', 'numpy.core.result_type', 'numpy.core.right_shift', 'numpy.core.rollaxis', 'numpy.core.shape', 'numpy.core.signbit', 'numpy.core.sin', 'numpy.core.single', 'numpy.core.size', 'numpy.core.sqrt', 'numpy.core.subtract', 'numpy.core.sum', 'numpy.core.swapaxes', 'numpy.core.take', 'numpy.core.transpose', 'numpy.core.ufunc', 'numpy.core.vstack', 'numpy.core.zeros', 'numpy.deprecate', 'numpy.dtype', 'numpy.expand_dims', 'numpy.eye', 'numpy.histogramdd', 'numpy.integer', 'numpy.intp', 'numpy.iscomplexobj', 'numpy.lib.add_newdoc', 'numpy.lib.asfarray', 'numpy.lib.i0', 'numpy.lib.imag', 'numpy.lib.iscomplexobj', 'numpy.lib.real', 'numpy.lib.triu', 'numpy.linalg.eigvals', 'numpy.linalg.inv', 'numpy.linalg.lstsq', 'numpy.ma.MAError', 'numpy.ma.MaskedArray', 'numpy.ma.filled', 'numpy.ma.getdata', 'numpy.ma.getmaskarray', 'numpy.ma.make_mask_descr', 'numpy.ma.masked', 'numpy.ma.masked_array', 'numpy.ma.nomask', 'numpy.ndarray', 'numpy.recarray', 'numpy_api', 'numpy_distutils', 'numpy_distutils.command.build_flib', 'numpy_distutils.command.cpuinfo', 'numpy_distutils.cpuinfo', 'numpy_distutils.fcompiler', 'org.python.modules.posix.PosixModule', 'packaging.specifiers', 'packaging.version', 'queue', 'scipy', 'setuptools_svn', 'sitecustomize', 'testing.Tester', 'urllib.error', 'urllib.parse', 'urllib.request', 'usercustomize', 'win32com.gen_py', 'wincertstore', 'winreg', 'pygame.sdlmain_osx']
+        # self.exclude_modules = []
         
         #DLL Excludes
         self.exclude_dll = ['MSVCP90.dll', 'numpy-atlas.dll', 'KERNEL32.dll', 'OLEAUT32.dll', \
         'USER32.dll', 'IMM32.dll', 'SHELL32.dll', 'COMDLG32.dll', \
-        'COMCTL32.dll', 'ADVAPI32.dll', 'WS2_32.dll', 'GDI32.dll', 'WINMM.dll', 'ole32.dll']
+        'COMCTL32.dll', 'ADVAPI32.dll', 'WS2_32.dll', 'GDI32.dll', 'WINMM.dll', 'ole32.dll', \
+        'WINSPOOL.DRV', 'mfc90.dll', 'VERSION.dll']
         #python scripts (strings) to be included, seperated by a comma
         self.extra_scripts = []
  

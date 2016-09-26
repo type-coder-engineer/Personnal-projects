@@ -206,10 +206,10 @@ def classicMode():
                 
             awards.add(award)
             award_frequency = 1
-            min_time = 600 - int(player.score / 5)
+            min_time = 600 - int(player.score / 8)
             if min_time < 280:
                 min_time = 280
-            max_time = 1000 - int(player.score / 4)
+            max_time = 1000 - int(player.score / 6)
             if max_time < 600:
                 max_time = 600
             award_time = random.randint(min_time, max_time)
@@ -372,7 +372,7 @@ def level1(clock, player):
                 enemies1.add(enemy1)    
                 
          #生成boss
-        if myTime == 51:
+        if myTime == 5100:
             boss = Boss_level1(boss_img, boss_down_img, boss_pos)
             boss_once_flag = 1
             boss_flag = 1
@@ -492,7 +492,13 @@ def level1(clock, player):
                 
             awards.add(award)
             award_frequency = 1
-            award_time = random.randint(500,800)
+            min_time = 1000 - int(player.score / 12)
+            if min_time < 800:
+                min_time = 800
+            max_time = 1300 - int(player.score / 10)
+            if max_time < 1000:
+                max_time = 1000
+            award_time = random.randint(min_time, max_time)
         else:
             award_frequency += 1
             
@@ -667,7 +673,7 @@ def level2(clock, player):
                 enemies1.add(enemy1)    
                 
          #生成boss
-        if myTime == 59:
+        if myTime == 5900:
             boss1 = Boss_level1(boss_img, boss_down_img, boss_pos_left)
             boss2 = Boss_level2(boss_img, boss_down_img, boss_pos_right)
             boss_once_flag = 1
@@ -840,7 +846,7 @@ def level2(clock, player):
         # 生成奖励
         if award_frequency == award_time and flag_betweenLevel == 0:
             type = random.randint(0, 20)
-            if type < 15:
+            if type < 13:
                 position = [random.randint(0, SCREEN_WIDTH - double_bullet_rect.width), 0]
                 award = Award(double_bullet_img, double_bullet_effect, position)
                 award.kind = 1
@@ -851,7 +857,13 @@ def level2(clock, player):
                 
             awards.add(award)
             award_frequency = 1
-            award_time = random.randint(500,700)
+            min_time = 900 - int(player.score / 12)
+            if min_time < 750:
+                min_time = 750
+            max_time = 1200 - int(player.score / 10)
+            if max_time < 1000:
+                max_time = 1000
+            award_time = random.randint(min_time, max_time)
         else:
             award_frequency += 1
             
@@ -1042,7 +1054,7 @@ def level3(clock, player):
                 enemies1.add(enemy1)    
                 
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % 400 == 0:  # 通过这个数字来确定出现的频率
+            if myTime % 400 == 0 and myTime > 0:  # 通过这个数字来确定出现的频率, 不要一上来就有
                 enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
                 enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
                 enemies2.add(enemy2)
@@ -1271,7 +1283,13 @@ def level3(clock, player):
                 
             awards.add(award)
             award_frequency = 1
-            award_time = random.randint(400,600)
+            min_time = 700 - int(player.score / 15)
+            if min_time < 500:
+                min_time = 500
+            max_time = 900 - int(player.score / 10)
+            if max_time < 650:
+                max_time = 650
+            award_time = random.randint(min_time, max_time)
         else:
             award_frequency += 1
             
@@ -1458,7 +1476,7 @@ def level4(clock, player):
                 enemies1.add(enemy1)    
                 
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % 300 == 0:  # 通过这个数字来确定出现的频率
+            if myTime % 300 == 0 and myTime > 0:  # 通过这个数字来确定出现的频率
                 enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
                 enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
                 enemies2.add(enemy2)
@@ -1739,7 +1757,13 @@ def level4(clock, player):
                 
             awards.add(award)
             award_frequency = 1
-            award_time = random.randint(300,500)
+            min_time = 700 - int(player.score / 20)
+            if min_time < 400:
+                min_time = 400
+            max_time = 900 - int(player.score / 15)
+            if max_time < 600:
+                max_time = 600
+            award_time = random.randint(min_time, max_time)
         else:
             award_frequency += 1
             
@@ -1955,7 +1979,7 @@ def level5(clock, player):
                 enemies1.add(enemy1)    
          # enemy2 有enemy1的保护       
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % 300 == 0 and myTime <= 5400:  # 通过这个数字来确定出现的频率
+            if myTime % 300 == 0 and myTime > 0 and myTime <= 5400:  # 通过这个数字来确定出现的频率
                 enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
                 enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
                 enemies2.add(enemy2)
@@ -2023,13 +2047,25 @@ def level5(clock, player):
                 if boss.ishit_flag == 1:
                     boss.ishit_flag = 0  # 只是那一下才会触发，之后就没有ishit的flag了
                  
-                if boss.life < 15 and boss.summon == 0 and boss_summon_flag == 0 and boss_summon_down_flag == 0:
+                if boss.life < 18 and boss.summon == 0 and boss_summon_flag == 0 and boss_summon_down_flag == 0:
                     boss_summon = Boss_summon(boss_img, boss_down_img, boss_pos)
                     boss_summon_flag = 1
                     boss_summon_once_flag = 1
                     boss.summon = boss.summon_recharge
                 if boss.summon > 0:
                     boss.summon -= 1
+                
+                if boss.life < 10 and (boss.enemy1 == 0 or boss.enemy1 == 30 or boss.enemy1 == 60 or boss.enemy1 == 90):
+                    for one in range(0, 5):
+                        enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+                        enemy1 = Enemy1_level5(enemy1_img, enemy1_down_img, enemy1_pos)
+                        enemies1.add(enemy1)
+                    if boss.enemy1 == 0:
+                        boss.enemy1 = boss.enemy1_recharge
+                if boss.life < 10:
+                    if boss.enemy1 > 0:
+                        boss.enemy1 -= 1
+                    
                 boss.move(target, boss.mode)
                 
                 if boss.bullet > 0: 
@@ -2279,7 +2315,13 @@ def level5(clock, player):
                     
                 awards.add(award)
                 award_frequency = 1
-                award_time = random.randint(400,600)
+                min_time = 600 - int(player.score / 25)
+                if min_time < 350:
+                    min_time = 350
+                max_time = 900 - int(player.score / 20)
+                if max_time < 500:
+                    max_time = 500
+                award_time = random.randint(min_time, max_time)
             else:
                 award_frequency += 1
             
@@ -2429,7 +2471,8 @@ def level5(clock, player):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()    
-                
+ 
+# 结束时的画面 
 def over():
     clock = pygame.time.Clock()
     myX = [-3, 3, -3, 3]
@@ -2441,6 +2484,7 @@ def over():
     myYesCentery = screen.get_rect().centery + 170
     myNoCenterx = screen.get_rect().centerx
     myNoCentery = screen.get_rect().centery + 220
+    save_game()
     
     while running:
         clock.tick(60)
@@ -2515,7 +2559,8 @@ def over():
                     pygame.quit()
                     exit()
         pygame.display.update()
-    
+ 
+# 开始画面 
 def opening():   
     running = 1
     clock = pygame.time.Clock()
@@ -2674,6 +2719,7 @@ def opening():
                     return 'rules'
         pygame.display.update()
 
+# 规则界面
 def rules():
     running = 1
     clock = pygame.time.Clock()
@@ -2784,7 +2830,8 @@ def rules():
                 if poslist[0] > 270 and poslist[0] < 530 and poslist[1] > 530 and poslist[1] < 570:
                     running = 0
         pygame.display.update()    
-        
+
+# 新游戏        
 def newgame_main(): 
     player = Player(player_img, player_down_img, player_pos)
     clock = pygame.time.Clock()
@@ -2809,11 +2856,9 @@ def newgame_main():
                     if myGame != 1:
                         over()
                     else:
-                        congraduation_onelife()
-                    
-    #level5(clock, player)
+                        congraduation_onelife()                    
 
-    
+# 选择加载游戏界面                     
 def loadGame():
     running = 1
     clock = pygame.time.Clock()
@@ -3007,6 +3052,7 @@ def loadGame():
                         
         pygame.display.update()
 
+# 加载游戏的main
 def load_main(level):
     player = Player(player_img, player_down_img, player_pos)
     clock = pygame.time.Clock()
@@ -3062,7 +3108,8 @@ def load_main(level):
             over()
         else:
             congraduation() 
-            
+
+# 一条命过关的祝贺画面            
 def congraduation_onelife():
     running = 1
     clock = pygame.time.Clock()
@@ -3149,7 +3196,8 @@ def congraduation_onelife():
                 if poslist[0] > 270 and poslist[0] < 530 and poslist[1] > 530 and poslist[1] < 570:
                     running = 0
         pygame.display.update()              
-        
+
+# load过关画面        
 def congraduation():
     running = 1
     clock = pygame.time.Clock()
@@ -3236,11 +3284,33 @@ def congraduation():
                 if poslist[0] > 270 and poslist[0] < 530 and poslist[1] > 530 and poslist[1] < 570:
                     running = 0
         pygame.display.update()        
-    
+
+# 保存游戏数据到game_data        
+def save_game():
+    global pass_level
+    target = open('game_data', 'w')
+    target.write(str(pass_level))
+    target.close()
+    return
+
+# 从game_data 中读取数据
+def load_game():
+    global pass_level
+    # path = 'resources'  # 有了这个path的改变exe就没法运行了。。。不得已就把data放在外面了
+    # os.chdir(path)
+    if not os.path.isfile('game_data'): #如果没有数据就从1开始
+        pass_level = 1
+        return
+    else:
+        target = open('game_data', 'r')
+        pass_level = int(target.readline())
+        target.close()
+        return
+        
 if __name__ == '__main__': 
     global pass_level
-    pass_level = 1
-    
+    load_game()
+
     while(1):
         choice = opening()
         if choice == "rules":
