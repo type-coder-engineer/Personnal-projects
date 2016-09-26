@@ -84,7 +84,7 @@ void MainWindow::on_about_game(){
 }
 
 void MainWindow::on_newGame(){
-    myarea = new BlockArea(4,10); // 一开始测试的时候发现8，8的时候卡住不动了。。。后来发现是因为一开始要初始化出至少8*8/4 = 16个解
+    myarea = new BlockArea(6,10); // 一开始测试的时候发现8，8的时候卡住不动了。。。后来发现是因为一开始要初始化出至少8*8/4 = 16个解
     // 有点困难，所以现在就把一开始的解变少了。
     this->setCentralWidget(myarea);
     this->resize(12*120,6*130);

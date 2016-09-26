@@ -66,7 +66,7 @@ class Player(pygame.sprite.Sprite):
         self.bullet_max = 5
         self.bomb_max = 3
         self.bullet = 5
-        self.bomb = 20
+        self.bomb = 1
         self.score = 0
         self.recharge_time = 60
         self.shoot_frequency = 15
@@ -286,7 +286,7 @@ class Boss_level2(Boss):
     def __init__(self, boss_img, boss_down_img, init_pos):
         Boss.__init__(self, boss_img, boss_down_img, init_pos)
         self.speed = 3
-        self.life = 20
+        self.life = 25
         self.bullet_max = 5
         self.bullet = self.bullet_max
         self.recharge = 200
@@ -493,7 +493,7 @@ class Enemy1_Boss(Enemy1):
 class Boss_level5(Enemy1):
     def __init__(self, enemy_img, enemy_down_imgs, init_pos):
         Enemy1.__init__(self, enemy_img, enemy_down_imgs, init_pos)
-        self.life = 25
+        self.life = 30
         self.bullet_max = 6
         self.bullet = self.bullet_max
         self.shoot_frequency = 20
