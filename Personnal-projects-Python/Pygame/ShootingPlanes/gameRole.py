@@ -20,10 +20,6 @@ import random
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 700
-
-TYPE_SMALL = 1
-TYPE_MIDDLE = 2
-TYPE_BIG = 3
         
 # the class bullet
 class Bullet(pygame.sprite.Sprite):

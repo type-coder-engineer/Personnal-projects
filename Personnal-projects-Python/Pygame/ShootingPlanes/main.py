@@ -14,7 +14,13 @@ import os
 
     # initialize the game
 pygame.init()
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+if os.name == 'posix':
+    flags = FULLSCREEN | DOUBLEBUF
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags)
+    screen.set_alpha(None)
+else:
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    screen.set_alpha(None)
 pygame.display.set_caption('shootPlanes')
 
 # load the music
@@ -139,6 +145,9 @@ def classicMode():
     player = Player(player_img, player_down_img, player_pos)
     clock = pygame.time.Clock()
     global myScore #注意global变量的声明一定要放在定义这个变量的block中，我是在level1中第一次定义myScore = player.score的，所以要在level1中声明myScore
+    score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+    bomb_font = pygame.font.Font('freesansbold.ttf', 20)
     
     while running:
         # 控制游戏最大帧率为60
@@ -173,11 +182,25 @@ def classicMode():
             enemy1.move()
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy1, player):
-                enemies1_down.add(enemy1)
-                enemies1.remove(enemy1)
-                player.is_hit = True
-                game_over_sound.play()
-                break
+                if (enemy1.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy1.rect.centerx - player.rect.centerx) < 30:
+                        enemies1_down.add(enemy1)
+                        enemies1.remove(enemy1)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                        break
+                    else:
+                        pass
+                        
+                elif (enemy1.rect.centery - player.rect.centery) > 50:                    
+                    pass
+                else:
+                    enemies1_down.add(enemy1)
+                    enemies1.remove(enemy1)
+                    player.is_hit = True
+                    game_over_sound.play() 
+                    break
+                    
             if enemy1.rect.top > SCREEN_HEIGHT:
                 enemies1.remove(enemy1)   
             
@@ -252,14 +275,14 @@ def classicMode():
         enemies1.draw(screen)
             
         # 绘制得分
-        score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+        # score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
         score_text = score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
         text_rect = score_text.get_rect()
         text_rect.topleft = [10, 5]
         screen.blit(score_text, text_rect)
                 
         # 绘制子弹数目和bomb数目
-        bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
             bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
         else:
@@ -273,7 +296,7 @@ def classicMode():
         bulletText_rect = bullet_text.get_rect()
         bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定bullet的位置
         screen.blit(bullet_text, bulletText_rect)
-        bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bomb_font = pygame.font.Font('freesansbold.ttf', 20)
         bomb_text = bomb_font.render('Bomb x ' + str(player.bomb), True, (128, 128, 128))
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
@@ -321,6 +344,7 @@ def classicMode():
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
+            get_double_bullet_sound.play()  # 效果失效时提醒一下
                 
         # 更新屏幕
         pygame.display.update()
@@ -331,27 +355,72 @@ def classicMode():
                 pygame.quit()
                 exit()   
 
-def level1(clock, player):
+def level1(clock, player, flag_saw_boss, again):
+    if again == 1:
+        player.bullet = 5
+        player.bomb = 1
+        player.index = 0
+        player.down_index = 0
+        player.rect.topleft = player_pos
+        player.is_hit = False
+        player.score = 0
+        
     enemies1 = pygame.sprite.Group()  # enemy1的group
     awards = pygame.sprite.Group()  # 奖励的group
     enemies1_down = pygame.sprite.Group()  # 被击毁的就放入这个group中一起处理
 
     award_frequency = 1
     award_time = 100  # 第一个award出现
-    boss_flag = 0
+    boss_flag = flag_saw_boss
+    if boss_flag == 1:
+        myTime = 4300
+    else:
+        myTime = 0
     boss_down_flag = 0
     boss_once_flag = 0
-    myTime = 0
     running = 1
     flag_betweenLevel = 0
     index_betweenLevel = 0
     global myScore #注意global变量的声明一定要放在定义这个变量的block中，我是在level1中第一次定义myScore = player.score的，所以要在level1中声明myScore
     global myGame
     global pass_level
+    openingFont = pygame.font.Font('freesansbold.ttf', 50)
+    level1Text = openingFont.render("--LEVEL1--", True, (0, 0, 0))
+    level2Text = openingFont.render("--LEVEL2--", True, (0, 0, 0))
+    level1Text_rect = level1Text.get_rect()
+    level2Text_rect = level2Text.get_rect()
+    myCenterx = screen.get_rect().centerx - 830
+    myCentery = screen.get_rect().centery
+    speed_rect_slow = 0.5
+    speed_rect_fast = 80
+    score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+    bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+    bomb_font = pygame.font.Font('freesansbold.ttf', 20)
     
+    while boss_flag == 0:
+        clock.tick(60)
+        screen.fill(0)
+        level1Text_rect.centerx = myCenterx
+        level1Text_rect.centery = myCentery
+        screen.blit(background, (0, 0))
+        
+        screen.blit(level1Text, level1Text_rect)       
+        if myCenterx < screen.get_rect().centerx - 30 or myCenterx > screen.get_rect().centerx + 30:
+            myCenterx += speed_rect_fast
+        else:
+            myCenterx += speed_rect_slow
+        if myCenterx > screen.get_rect().centerx + 800:
+            myCenterx = screen.get_rect().centerx - 830
+            break
+            
+        screen.blit(player.image[player.index], player.rect)
+        pygame.display.update()
+        
     while running:
         # 控制游戏最大帧率为60
         clock.tick(60)
+        # print clock.get_fps()
         # 绘制背景
         screen.fill(0)
         screen.blit(background, (0, 0))
@@ -360,19 +429,30 @@ def level1(clock, player):
             if index_betweenLevel == 0:
                 beat_boss_sound.play()
             index_betweenLevel += 1
+            
+            if index_betweenLevel >= 200 and index_betweenLevel <= 350:
+                level2Text_rect.centerx = myCenterx
+                level2Text_rect.centery = myCentery
+                
+                screen.blit(level2Text, level2Text_rect)       
+                if myCenterx < screen.get_rect().centerx - 30 or myCenterx > screen.get_rect().centerx + 30:
+                    myCenterx += speed_rect_fast
+                else:
+                    myCenterx += speed_rect_slow
+            
             if index_betweenLevel == 400:
                 if pass_level < 2:
                     pass_level = 2
-                running = 0
+                return 1
             
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % (100 - int(myTime / 80)) == 0 and myTime <= 4800:  # 通过这个数字来确定出现的频率
+            if myTime % (90 - int(myTime / 80)) == 0 and myTime <= 4000:  # 通过这个数字来确定出现的频率
                 enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
                 enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
          #生成boss
-        if myTime == 5100:
+        if myTime == 4300:
             boss = Boss_level1(boss_img, boss_down_img, boss_pos)
             boss_once_flag = 1
             boss_flag = 1
@@ -442,19 +522,45 @@ def level1(clock, player):
             enemy1.move()
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy1, player):
-                enemies1_down.add(enemy1)
-                enemies1.remove(enemy1)
-                player.is_hit = True
-                game_over_sound.play()
-                break
+                if (enemy1.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy1.rect.centerx - player.rect.centerx) < 30:
+                        enemies1_down.add(enemy1)
+                        enemies1.remove(enemy1)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                        break
+                    else:
+                        pass
+                        
+                elif (enemy1.rect.centery - player.rect.centery) > 50:                    
+                    pass
+                else:
+                    enemies1_down.add(enemy1)
+                    enemies1.remove(enemy1)
+                    player.is_hit = True
+                    game_over_sound.play() 
+                    break
+                    
             if enemy1.rect.top > SCREEN_HEIGHT:
                 enemies1.remove(enemy1)   
 
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
-                boss.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        boss.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    boss.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             boss.enemy_bullets.draw(screen)   
             
     # 绘制敌机和boss击毁动画
@@ -528,9 +634,10 @@ def level1(clock, player):
             screen.blit(player.down_imgs[player.index], player.rect)
             player.down_index += 1
             if player.down_index > 31:
-                running = 0  # 效果结束后这个循环就结束了
+                running = 0  # 效果结束后这个循环就结束了 
                 myGame = 0
                 myScore = player.score
+                return boss_flag
                 
  # 绘制子弹和和奖励和敌机
         player.bullets.draw(screen)
@@ -538,14 +645,14 @@ def level1(clock, player):
         enemies1.draw(screen)
             
         # 绘制得分
-        score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+        # score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
         score_text = score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
         text_rect = score_text.get_rect()
         text_rect.topleft = [10, 5]
         screen.blit(score_text, text_rect)
         # 绘制boss血量
         if boss_flag == 1 and boss_down_flag == 0:
-            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            # boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
             strbosslife = ''
             for i in range(0, boss.life):
                 strbosslife += '[]'
@@ -555,7 +662,7 @@ def level1(clock, player):
             screen.blit(boss_life_text, boss_life_rect)
                 
         # 绘制子弹数目和bomb数目
-        bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
             bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
         else:
@@ -569,7 +676,7 @@ def level1(clock, player):
         bulletText_rect = bullet_text.get_rect()
         bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定bullet的位置
         screen.blit(bullet_text, bulletText_rect)
-        bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bomb_font = pygame.font.Font('freesansbold.ttf', 20)
         bomb_text = bomb_font.render('Bomb x ' + str(player.bomb), True, (128, 128, 128))
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
@@ -621,7 +728,8 @@ def level1(clock, player):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-                
+            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            
         # 更新屏幕
         pygame.display.update()
         myTime += 1
@@ -631,24 +739,47 @@ def level1(clock, player):
                 pygame.quit()
                 exit()   
 
-def level2(clock, player):     
+def level2(clock, player, flag_saw_boss, again):  
+    if again == 1:
+        player.bullet = 5
+        player.bomb = 1
+        player.index = 0
+        player.down_index = 0
+        player.rect.topleft = player_pos
+        player.is_hit = False
+        player.score = 0
+        
     enemies1 = pygame.sprite.Group()  # enemy1的group
     awards = pygame.sprite.Group()  # 奖励的group
     enemies1_down = pygame.sprite.Group()  # 被击毁的就放入这个group中一起处理
 
     award_frequency = 1
     award_time = 100  # 第一个award出现
-    boss_flag = 0
+    boss_flag = flag_saw_boss
+    if boss_flag == 1:
+        myTime = 5900
+    else:
+        myTime = 0
     boss1_down_flag = 0
     boss2_down_flag = 0
     boss_once_flag = 0
-    myTime = 0
     running = 1
     flag_betweenLevel = 0
     index_betweenLevel = 0
     global myScore
     global myGame
     global pass_level
+    openingFont = pygame.font.Font('freesansbold.ttf', 50)
+    level3Text = openingFont.render("--LEVEL3--", True, (0, 0, 0))
+    level3Text_rect = level3Text.get_rect()
+    myCenterx = screen.get_rect().centerx - 830
+    myCentery = screen.get_rect().centery
+    speed_rect_slow = 0.5
+    speed_rect_fast = 80
+    score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+    bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+    bomb_font = pygame.font.Font('freesansbold.ttf', 20)
     
     while running:
         # 控制游戏最大帧率为60
@@ -661,10 +792,21 @@ def level2(clock, player):
             if index_betweenLevel == 0:
                 beat_boss_sound.play()
             index_betweenLevel += 1
+            
+            if index_betweenLevel >= 200 and index_betweenLevel <= 350:
+                level3Text_rect.centerx = myCenterx
+                level3Text_rect.centery = myCentery
+                
+                screen.blit(level3Text, level3Text_rect)       
+                if myCenterx < screen.get_rect().centerx - 30 or myCenterx > screen.get_rect().centerx + 30:
+                    myCenterx += speed_rect_fast
+                else:
+                    myCenterx += speed_rect_slow
+                    
             if index_betweenLevel == 400:
                 if pass_level < 3:
                     pass_level = 3
-                running = 0
+                return 1
                 
         if boss_flag == 0 and boss1_down_flag == 0 and boss2_down_flag == 0 and flag_betweenLevel == 0:
             if myTime % (90 - int(myTime / 70)) == 0 and myTime <= 5600:  # 通过这个数字来确定出现的频率
@@ -790,24 +932,62 @@ def level2(clock, player):
             enemy1.move()
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy1, player):
-                enemies1_down.add(enemy1)
-                enemies1.remove(enemy1)
-                player.is_hit = True
-                game_over_sound.play()
-                break
+                if (enemy1.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy1.rect.centerx - player.rect.centerx) < 30:
+                        enemies1_down.add(enemy1)
+                        enemies1.remove(enemy1)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                        break
+                    else:
+                        pass
+                        
+                elif (enemy1.rect.centery - player.rect.centery) > 50:                    
+                    pass
+                else:
+                    enemies1_down.add(enemy1)
+                    enemies1.remove(enemy1)
+                    player.is_hit = True
+                    game_over_sound.play() 
+                    break
+                    
             if enemy1.rect.top > SCREEN_HEIGHT:
                 enemies1.remove(enemy1)   
 
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss1.enemy_bullets) :
-                boss1.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        boss1.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    boss1.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             boss1.enemy_bullets.draw(screen)   
             if pygame.sprite.spritecollideany(player, boss2.enemy_bullets) :
-                boss2.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        boss2.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    boss2.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             boss2.enemy_bullets.draw(screen)   
             
     # 绘制敌机和boss击毁动画
@@ -893,9 +1073,9 @@ def level2(clock, player):
             screen.blit(player.down_imgs[player.index], player.rect)
             player.down_index += 1
             if player.down_index > 31:
-                running = 0  # 效果结束后这个循环就结束了
                 myGame = 0
                 myScore = player.score
+                return boss_flag # 效果结束后这个循环就结束了
                 
  # 绘制子弹和和奖励和敌机
         player.bullets.draw(screen)
@@ -903,14 +1083,14 @@ def level2(clock, player):
         enemies1.draw(screen)
             
         # 绘制得分
-        score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+        # score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
         score_text = score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
         text_rect = score_text.get_rect()
         text_rect.topleft = [10, 5]
         screen.blit(score_text, text_rect)
         # 绘制boss血量
         if boss_flag == 1 and boss1_down_flag == 0:
-            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            # boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
             strbosslife = ''
             for i in range(0, boss1.life):
                 strbosslife += '[]'
@@ -920,7 +1100,7 @@ def level2(clock, player):
             screen.blit(boss_life_text, boss_life_rect)
             
         if boss_flag == 1 and boss2_down_flag == 0:
-            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            # boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
             strbosslife = ''
             for i in range(0, boss2.life):
                 strbosslife += '[]'
@@ -930,7 +1110,7 @@ def level2(clock, player):
             screen.blit(boss_life_text, boss_life_rect)       
             
         # 绘制子弹数目和bomb数目
-        bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
             bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
         else:
@@ -944,7 +1124,7 @@ def level2(clock, player):
         bulletText_rect = bullet_text.get_rect()
         bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定bullet的位置
         screen.blit(bullet_text, bulletText_rect)
-        bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bomb_font = pygame.font.Font('freesansbold.ttf', 20)
         bomb_text = bomb_font.render('Bomb x ' + str(player.bomb), True, (128, 128, 128))
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
@@ -999,7 +1179,8 @@ def level2(clock, player):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-                
+            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            
         # 更新屏幕
         pygame.display.update()
         myTime += 1
@@ -1009,7 +1190,16 @@ def level2(clock, player):
                 pygame.quit()
                 exit()      
 
-def level3(clock, player):
+def level3(clock, player, flag_saw_boss, again):
+    if again == 1:
+        player.bullet = 5
+        player.bomb = 1
+        player.index = 0
+        player.down_index = 0
+        player.rect.topleft = player_pos
+        player.is_hit = False
+        player.score = 0
+        
     enemies1 = pygame.sprite.Group()  # enemy1的group
     enemies2 = pygame.sprite.Group()  # enemy2的group
     awards = pygame.sprite.Group()  # 奖励的group
@@ -1018,10 +1208,13 @@ def level3(clock, player):
     enemy2_once_flag = 0
     award_frequency = 1
     award_time = 100  # 第一个award出现
-    boss_flag = 0
+    boss_flag = flag_saw_boss
+    if boss_flag == 1:
+        myTime = 6700
+    else:
+        myTime = 0
     boss_down_flag = 0
     boss_once_flag = 0
-    myTime = 0
     running = 1
     boss_begin = 1 # boss第一次出现的flag
     flag_betweenLevel = 0
@@ -1029,6 +1222,17 @@ def level3(clock, player):
     global myScore 
     global myGame
     global pass_level
+    openingFont = pygame.font.Font('freesansbold.ttf', 50)
+    level4Text = openingFont.render("--LEVEL4--", True, (0, 0, 0))
+    level4Text_rect = level4Text.get_rect()
+    myCenterx = screen.get_rect().centerx - 830
+    myCentery = screen.get_rect().centery
+    speed_rect_slow = 0.5
+    speed_rect_fast = 80
+    score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+    bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+    bomb_font = pygame.font.Font('freesansbold.ttf', 20)
     
     while running:
         # 控制游戏最大帧率为60
@@ -1041,10 +1245,21 @@ def level3(clock, player):
             if index_betweenLevel == 0:
                 beat_boss_sound.play()
             index_betweenLevel += 1
+            
+            if index_betweenLevel >= 200 and index_betweenLevel <= 350:
+                level4Text_rect.centerx = myCenterx
+                level4Text_rect.centery = myCentery
+                
+                screen.blit(level4Text, level4Text_rect)       
+                if myCenterx < screen.get_rect().centerx - 30 or myCenterx > screen.get_rect().centerx + 30:
+                    myCenterx += speed_rect_fast
+                else:
+                    myCenterx += speed_rect_slow
+                    
             if index_betweenLevel == 400:
                 if pass_level < 4:
                     pass_level = 4
-                running = 0
+                return 1
                 
         # 生成两种敌人
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
@@ -1166,9 +1381,21 @@ def level3(clock, player):
                 
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
-                boss.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        boss.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    boss.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             boss.enemy_bullets.draw(screen)   
                             
         enemies1_shot = pygame.sprite.groupcollide(enemies1, player.bullets, 1, 1)
@@ -1200,11 +1427,25 @@ def level3(clock, player):
             enemy1.move()
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy1, player):
-                enemies1_down.add(enemy1)
-                enemies1.remove(enemy1)
-                player.is_hit = True
-                game_over_sound.play()
-                break
+                if (enemy1.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy1.rect.centerx - player.rect.centerx) < 30:
+                        enemies1_down.add(enemy1)
+                        enemies1.remove(enemy1)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                        break
+                    else:
+                        pass
+                        
+                elif (enemy1.rect.centery - player.rect.centery) > 50:                    
+                    pass
+                else:
+                    enemies1_down.add(enemy1)
+                    enemies1.remove(enemy1)
+                    player.is_hit = True
+                    game_over_sound.play() 
+                    break
+                    
             if enemy1.rect.top > SCREEN_HEIGHT:
                 enemies1.remove(enemy1)   
 
@@ -1223,19 +1464,46 @@ def level3(clock, player):
             screen.blit(enemy2.images[enemy2.img_index], enemy2.rect)
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy2, player):
-                enemies2_down.add(enemy2)
-                enemies2.remove(enemy2)
-                player.is_hit = True
-                game_over_sound.play()
-                break
+                if (enemy2.rect.centery - player.rect.centery) < -50:
+                    if abs(enemy2.rect.centerx - player.rect.centerx) < 35:
+                        enemies2_down.add(enemy2)
+                        enemies2.remove(enemy2)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                        break
+
+                    else:
+                        pass
+                        
+                elif (enemy2.rect.centery - player.rect.centery) > 70:                    
+                    pass
+                else:
+                    enemies2_down.add(enemy2)
+                    enemies2.remove(enemy2)
+                    player.is_hit = True
+                    game_over_sound.play() 
+                    break
+
             if enemy2.rect.top > SCREEN_HEIGHT:
                 enemies2.remove(enemy2)   
 
         if enemy2_once_flag == 1:
             if pygame.sprite.spritecollideany(player, enemy2.enemy_bullets) :
-                enemy2.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        enemy2.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    enemy2.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             enemy2.enemy_bullets.draw(screen)             
             
     # 绘制敌机和boss击毁动画
@@ -1319,9 +1587,10 @@ def level3(clock, player):
             screen.blit(player.down_imgs[player.index], player.rect)
             player.down_index += 1
             if player.down_index > 31:
-                running = 0  # 效果结束后这个循环就结束了
+                # 效果结束后这个循环就结束了
                 myGame = 0
                 myScore = player.score
+                return boss_flag
                 
  # 绘制子弹和和奖励和敌机
         player.bullets.draw(screen)
@@ -1329,14 +1598,14 @@ def level3(clock, player):
         enemies1.draw(screen)
             
         # 绘制得分
-        score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+        # score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
         score_text = score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
         text_rect = score_text.get_rect()
         text_rect.topleft = [10, 5]
         screen.blit(score_text, text_rect)
         # 绘制boss血量
         if boss_flag == 1 and boss_down_flag == 0:
-            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            # boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
             strbosslife = ''
             for i in range(0, boss.life):
                 strbosslife += '[]'
@@ -1346,7 +1615,7 @@ def level3(clock, player):
             screen.blit(boss_life_text, boss_life_rect)
                 
         # 绘制子弹数目和bomb数目
-        bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
             bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
         else:
@@ -1360,7 +1629,7 @@ def level3(clock, player):
         bulletText_rect = bullet_text.get_rect()
         bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定bullet的位置
         screen.blit(bullet_text, bulletText_rect)
-        bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bomb_font = pygame.font.Font('freesansbold.ttf', 20)
         bomb_text = bomb_font.render('Bomb x ' + str(player.bomb), True, (128, 128, 128))
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
@@ -1418,7 +1687,8 @@ def level3(clock, player):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-                
+            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            
         # 更新屏幕
         pygame.display.update()
         myTime += 1
@@ -1428,7 +1698,16 @@ def level3(clock, player):
                 pygame.quit()
                 exit()    
 
-def level4(clock, player):
+def level4(clock, player, flag_saw_boss, again):
+    if again == 1:
+        player.bullet = 5
+        player.bomb = 1
+        player.index = 0
+        player.down_index = 0
+        player.rect.topleft = player_pos
+        player.is_hit = False
+        player.score = 0
+        
     enemies1 = pygame.sprite.Group()  # enemy1的group
     enemies2 = pygame.sprite.Group()  # enemy2的group
     awards = pygame.sprite.Group()  # 奖励的group
@@ -1437,10 +1716,13 @@ def level4(clock, player):
     enemy2_once_flag = 0
     award_frequency = 1
     award_time = 100  # 第一个award出现
-    boss_flag = 0
+    boss_flag = flag_saw_boss
+    if boss_flag == 1:
+        myTime = 7500
+    else:
+        myTime = 0
     boss_down_flag = 0
     boss_once_flag = 0
-    myTime = 0
     running = 1
     boss_begin = 1 # boss第一次出现的flag
     flag_betweenLevel = 0
@@ -1451,6 +1733,17 @@ def level4(clock, player):
     global myScore 
     global myGame
     global pass_level
+    openingFont = pygame.font.Font('freesansbold.ttf', 50)
+    level5Text = openingFont.render("--LEVEL5--", True, (0, 0, 0))
+    level5Text_rect = level5Text.get_rect()
+    myCenterx = screen.get_rect().centerx - 830
+    myCentery = screen.get_rect().centery
+    speed_rect_slow = 0.5
+    speed_rect_fast = 80
+    score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+    bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+    bomb_font = pygame.font.Font('freesansbold.ttf', 20)
     
     while running:
         # 控制游戏最大帧率为60
@@ -1463,10 +1756,21 @@ def level4(clock, player):
             if index_betweenLevel == 0:
                 beat_boss_sound.play() 
             index_betweenLevel += 1
+            
+            if index_betweenLevel >= 200 and index_betweenLevel <= 350:
+                level5Text_rect.centerx = myCenterx
+                level5Text_rect.centery = myCentery
+                
+                screen.blit(level5Text, level5Text_rect)       
+                if myCenterx < screen.get_rect().centerx - 30 or myCenterx > screen.get_rect().centerx + 30:
+                    myCenterx += speed_rect_fast
+                else:
+                    myCenterx += speed_rect_slow
+                    
             if index_betweenLevel == 400:
                 if pass_level < 5:
                     pass_level = 5
-                running = 0
+                return 1
                 
         # 生成两种敌人
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
@@ -1631,9 +1935,21 @@ def level4(clock, player):
                 
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
-                boss.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        boss.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    boss.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             boss.enemy_bullets.draw(screen)   
                             
         enemies1_shot = pygame.sprite.groupcollide(enemies1, player.bullets, 1, 1)
@@ -1669,11 +1985,25 @@ def level4(clock, player):
                 enemy1.move()
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy1, player):
-                enemies1_down.add(enemy1)
-                enemies1.remove(enemy1)
-                player.is_hit = True
-                game_over_sound.play()
-                break
+                if (enemy1.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy1.rect.centerx - player.rect.centerx) < 30:
+                        enemies1_down.add(enemy1)
+                        enemies1.remove(enemy1)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                        break
+                    else:
+                        pass
+                        
+                elif (enemy1.rect.centery - player.rect.centery) > 50:                    
+                    pass
+                else:
+                    enemies1_down.add(enemy1)
+                    enemies1.remove(enemy1)
+                    player.is_hit = True
+                    game_over_sound.play() 
+                    break
+                    
             if enemy1.rect.top > SCREEN_HEIGHT:
                 enemies1.remove(enemy1)   
 
@@ -1692,19 +2022,46 @@ def level4(clock, player):
             screen.blit(enemy2.images[enemy2.img_index], enemy2.rect)
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy2, player):
-                enemies2_down.add(enemy2)
-                enemies2.remove(enemy2)
-                player.is_hit = True
-                game_over_sound.play()
-                break
+                if (enemy2.rect.centery - player.rect.centery) < -50:
+                    if abs(enemy2.rect.centerx - player.rect.centerx) < 35:
+                        enemies2_down.add(enemy2)
+                        enemies2.remove(enemy2)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                        break
+
+                    else:
+                        pass
+                        
+                elif (enemy2.rect.centery - player.rect.centery) > 70:                    
+                    pass
+                else:
+                    enemies2_down.add(enemy2)
+                    enemies2.remove(enemy2)
+                    player.is_hit = True
+                    game_over_sound.play() 
+                    break
+                    
             if enemy2.rect.top > SCREEN_HEIGHT:
                 enemies2.remove(enemy2)   
 
         if enemy2_once_flag == 1:
             if pygame.sprite.spritecollideany(player, enemy2.enemy_bullets) :
-                enemy2.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        enemy2.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    enemy2.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             enemy2.enemy_bullets.draw(screen)             
             
     # 绘制敌机和boss击毁动画
@@ -1793,9 +2150,9 @@ def level4(clock, player):
             screen.blit(player.down_imgs[player.index], player.rect)
             player.down_index += 1
             if player.down_index > 31:
-                running = 0  # 效果结束后这个循环就结束了
                 myGame = 0
                 myScore = player.score
+                return boss_flag
                 
  # 绘制子弹和和奖励和敌机
         player.bullets.draw(screen)
@@ -1803,14 +2160,14 @@ def level4(clock, player):
         enemies1.draw(screen)
             
         # 绘制得分
-        score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+        # score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
         score_text = score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
         text_rect = score_text.get_rect()
         text_rect.topleft = [10, 5]
         screen.blit(score_text, text_rect)
         # 绘制boss血量
         if boss_flag == 1 and boss_down_flag == 0:
-            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            # boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
             strbosslife = ''
             for i in range(0, boss.life):
                 strbosslife += '[]'
@@ -1820,7 +2177,7 @@ def level4(clock, player):
             screen.blit(boss_life_text, boss_life_rect)
                 
         # 绘制子弹数目和bomb数目
-        bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
             bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
         else:
@@ -1834,7 +2191,7 @@ def level4(clock, player):
         bulletText_rect = bullet_text.get_rect()
         bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定bullet的位置
         screen.blit(bullet_text, bulletText_rect)
-        bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bomb_font = pygame.font.Font('freesansbold.ttf', 20)
         bomb_text = bomb_font.render('Bomb x ' + str(player.bomb), True, (128, 128, 128))
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
@@ -1892,7 +2249,8 @@ def level4(clock, player):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-                
+            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            
         # 更新屏幕
         pygame.display.update()
         myTime += 1
@@ -1902,7 +2260,16 @@ def level4(clock, player):
                 pygame.quit()
                 exit()
   
-def level5(clock, player):
+def level5(clock, player, flag_saw_boss, again):
+    if again == 1:
+        player.bullet = 5
+        player.bomb = 1
+        player.index = 0
+        player.down_index = 0
+        player.rect.topleft = player_pos
+        player.is_hit = False
+        player.score = 0
+        
     enemies1 = pygame.sprite.Group()  # enemy1的group
     enemies2 = pygame.sprite.Group()  # enemy2的group
     awards = pygame.sprite.Group()  # 奖励的group
@@ -1911,10 +2278,13 @@ def level5(clock, player):
     enemy2_once_flag = 0
     award_frequency = 1
     award_time = 100  # 第一个award出现
-    boss_flag = 0
+    boss_flag = flag_saw_boss
+    if boss_flag == 1:
+        myTime = 7500
+    else:
+        myTime = 0
     boss_down_flag = 0
     boss_once_flag = 0
-    myTime = 0
     running = 1
     boss_begin = 1 # boss第一次出现的flag
     flag_betweenLevel = 0
@@ -1927,7 +2297,7 @@ def level5(clock, player):
     plotFont = pygame.font.Font('freesansbold.ttf', 20)    
     flag_dialog = 0
     plot = []
-    plot.append("(You can use the space key to read the dialog)")
+    plot.append("(You can use the space key to read the dialogue or use 'b' to skip it)")
     plot.append("[Player: You seem a little different.]")
     plot.append("[Boss: Well I am the final boss so that makes sense]")
     plot.append("[Player: ...You, really?]")
@@ -1945,7 +2315,11 @@ def level5(clock, player):
     plot.append("[Boss: That's the spirit, may the better of us win ^_^]")    
     x = 0
     dialog_index = 1 # 用来防止一按空格就连按了
-    test = 0
+    score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+    bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+    bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+    
     while running:
         # 控制游戏最大帧率为60
         clock.tick(60)
@@ -1958,7 +2332,7 @@ def level5(clock, player):
                 beat_boss_sound.play()
             index_betweenLevel += 1
             if index_betweenLevel == 100:
-                running = 0
+                return 1
                 
         if flag_dialog == 1:    
             if x == 16:
@@ -2006,7 +2380,7 @@ def level5(clock, player):
                 
         if boss_flag == 1:
             if boss.flag_showup == 1 and flag_dialog == 2:
-                target = (player.rect.left + player.rect.right) / 2 - (boss.rect.left + boss.rect.right) / 2
+                target = player.rect.centerx - boss.rect.centerx
                 playerleft = list(player.rect.topleft)
                 playerright = list(player.rect.topright)
                 positionx = (playerleft[0] + playerright[0]) / 2
@@ -2033,11 +2407,11 @@ def level5(clock, player):
                     boss.teleportation_attack(positionx)
                     boss.teleportation = boss.teleportation_recharge
                     # 计策模式，如果玩家靠着边太近就从旁边包抄鱼他 LOL
-                if boss.mode == 1 and abs(target) > 200 and boss.teleportation == 0 and positionx < 150: 
+                if boss.mode == 1 and abs(target) > 500 and boss.teleportation == 0 and positionx < 150: 
                     boss.teleportation_attack(positionx + 300)
                     boss.teleportation = boss.teleportation_recharge
                     boss.mode = 2
-                if boss.mode == 1 and abs(target) > 200 and boss.teleportation == 0 and positionx > 650: 
+                if boss.mode == 1 and abs(target) > 500 and boss.teleportation == 0 and positionx > 650: 
                     boss.teleportation_attack(positionx - 300)
                     boss.teleportation = boss.teleportation_recharge
                     boss.mode = 2
@@ -2179,16 +2553,40 @@ def level5(clock, player):
                 
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
-                boss.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        boss.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    boss.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             boss.enemy_bullets.draw(screen)   
             
         if boss_summon_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss_summon.enemy_bullets) :
-                boss_summon.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        boss_summon.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    boss_summon.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             boss_summon.enemy_bullets.draw(screen)     
             
         enemies1_shot = pygame.sprite.groupcollide(enemies1, player.bullets, 1, 1)
@@ -2225,11 +2623,25 @@ def level5(clock, player):
             enemy1.move((player.rect.left + player.rect.right) / 2 - (enemy1.rect.left + enemy1.rect.right) / 2)
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy1, player):
-                enemies1_down.add(enemy1)
-                enemies1.remove(enemy1)
-                player.is_hit = True
-                game_over_sound.play()
-                break
+                if (enemy1.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy1.rect.centerx - player.rect.centerx) < 30:
+                        enemies1_down.add(enemy1)
+                        enemies1.remove(enemy1)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                        break
+                    else:
+                        pass
+                        
+                elif (enemy1.rect.centery - player.rect.centery) > 50:                    
+                    pass
+                else:
+                    enemies1_down.add(enemy1)
+                    enemies1.remove(enemy1)
+                    player.is_hit = True
+                    game_over_sound.play() 
+                    break
+                    
             if enemy1.rect.top > SCREEN_HEIGHT:
                 enemies1.remove(enemy1)   
 
@@ -2248,19 +2660,46 @@ def level5(clock, player):
             screen.blit(enemy2.images[enemy2.img_index], enemy2.rect)
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(enemy2, player):
-                enemies2_down.add(enemy2)
-                enemies2.remove(enemy2)
-                player.is_hit = True
-                game_over_sound.play()
-                break
+                if (enemy2.rect.centery - player.rect.centery) < -50:
+                    if abs(enemy2.rect.centerx - player.rect.centerx) < 35:
+                        enemies2_down.add(enemy2)
+                        enemies2.remove(enemy2)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                        break
+
+                    else:
+                        pass
+                        
+                elif (enemy2.rect.centery - player.rect.centery) > 70:                    
+                    pass
+                else:
+                    enemies2_down.add(enemy2)
+                    enemies2.remove(enemy2)
+                    player.is_hit = True
+                    game_over_sound.play() 
+                    break
+                    
             if enemy2.rect.top > SCREEN_HEIGHT:
                 enemies2.remove(enemy2)   
 
         if enemy2_once_flag == 1:
             if pygame.sprite.spritecollideany(player, enemy2.enemy_bullets) :
-                enemy2.enemy_bullets.remove(enemy_bullet)
-                player.is_hit = True
-                game_over_sound.play()
+                if (enemy_bullet.rect.centery - player.rect.centery) < -35:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                        enemy2.enemy_bullets.remove(enemy_bullet)
+                        player.is_hit = True
+                        game_over_sound.play() 
+                    else:
+                        pass
+                        
+                elif (enemy_bullet.rect.centery - player.rect.centery)  > 40:                    
+                    pass
+                else:
+                    enemy2.enemy_bullets.remove(enemy_bullet)
+                    player.is_hit = True
+                    game_over_sound.play()
+                    
             enemy2.enemy_bullets.draw(screen)             
             
     # 绘制敌机和boss击毁动画
@@ -2351,9 +2790,9 @@ def level5(clock, player):
             screen.blit(player.down_imgs[player.index], player.rect)
             player.down_index += 1
             if player.down_index > 31:
-                running = 0  # 效果结束后这个循环就结束了
                 myGame = 0
                 myScore = player.score
+                return boss_flag
                 
  # 绘制子弹和和奖励和敌机
         player.bullets.draw(screen)
@@ -2361,14 +2800,14 @@ def level5(clock, player):
         enemies1.draw(screen)
             
         # 绘制得分
-        score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+        # score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
         score_text = score_font.render(str(player.score), True, (128, 128, 128))   # RGB三个通道，表示颜色是灰色
         text_rect = score_text.get_rect()
         text_rect.topleft = [10, 5]
         screen.blit(score_text, text_rect)
         # 绘制boss血量
         if boss_flag == 1 and boss_down_flag == 0:
-            boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
+            # boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
             strbosslife = ''
             for i in range(0, boss.life):
                 strbosslife += '[]'
@@ -2378,7 +2817,7 @@ def level5(clock, player):
             screen.blit(boss_life_text, boss_life_rect)
                 
         # 绘制子弹数目和bomb数目
-        bullet_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
             bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
         else:
@@ -2392,7 +2831,7 @@ def level5(clock, player):
         bulletText_rect = bullet_text.get_rect()
         bulletText_rect.topleft = [SCREEN_WIDTH - 130, 10] # 确定bullet的位置
         screen.blit(bullet_text, bulletText_rect)
-        bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+        # bomb_font = pygame.font.Font('freesansbold.ttf', 20)
         bomb_text = bomb_font.render('Bomb x ' + str(player.bomb), True, (128, 128, 128))
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
@@ -2414,29 +2853,33 @@ def level5(clock, player):
                     dialog_index = 0
                     #使用炸弹
             if key_pressed[K_b]:
-                if player.bomb_frequency % 15 == 0 and player.bomb > 0:
-                    bomb_sound.play()
-                    player.bomb -= 1
-                    player.bomb_frequency = 0
-                    if boss_flag == 1 and boss.flag_showup == 1:
-                        boss.life -= boss.bomb_damage
-                        for enemy_bullet in boss.enemy_bullets:
-                            boss.enemy_bullets.remove(enemy_bullet)                       
-                    for enemy1 in enemies1:
-                        enemies1_down.add(enemy1)
-                        enemies1.remove(enemy1)
-                    if enemy2_once_flag == 1:          
-                        for enemy_bullet in enemy2.enemy_bullets:
-                            enemy2.enemy_bullets.remove(enemy_bullet)    
-                        for enemy2 in enemies2:
-                            enemies2_down.add(enemy2)
-                            enemies2.remove(enemy2)
-                    if boss_summon_once_flag == 1:
-                        for enemy_bullet in boss_summon.enemy_bullets:
-                            boss_summon.enemy_bullets.remove(enemy_bullet)
-                    if boss_summon_flag == 1 and boss_summon.flag_showup == 1:
-                        boss_summon.life -= boss_summon.bomb_damage
-                        
+                if flag_dialog != 1:
+                    if player.bomb_frequency % 15 == 0 and player.bomb > 0:
+                        bomb_sound.play()
+                        player.bomb -= 1
+                        player.bomb_frequency = 0
+                        if boss_flag == 1 and boss.flag_showup == 1:
+                            boss.life -= boss.bomb_damage
+                            for enemy_bullet in boss.enemy_bullets:
+                                boss.enemy_bullets.remove(enemy_bullet)                       
+                        for enemy1 in enemies1:
+                            enemies1_down.add(enemy1)
+                            enemies1.remove(enemy1)
+                        if enemy2_once_flag == 1:          
+                            for enemy_bullet in enemy2.enemy_bullets:
+                                enemy2.enemy_bullets.remove(enemy_bullet)    
+                            for enemy2 in enemies2:
+                                enemies2_down.add(enemy2)
+                                enemies2.remove(enemy2)
+                        if boss_summon_once_flag == 1:
+                            for enemy_bullet in boss_summon.enemy_bullets:
+                                boss_summon.enemy_bullets.remove(enemy_bullet)
+                        if boss_summon_flag == 1 and boss_summon.flag_showup == 1:
+                            boss_summon.life -= boss_summon.bomb_damage
+                            
+                else:
+                    x = 16
+                    
             if key_pressed[K_w] or key_pressed[K_UP]:
                 player.moveUp()
             if key_pressed[K_s] or key_pressed[K_DOWN]:
@@ -2462,7 +2905,8 @@ def level5(clock, player):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-                
+            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            
         # 更新屏幕
         pygame.display.update()
         myTime += 1
@@ -2477,14 +2921,17 @@ def over():
     clock = pygame.time.Clock()
     myX = [-3, 3, -3, 3]
     myY = [3, 3, -3, -3]
-    myIndex1 = myIndex2 = 0
-    flag1 = flag2 = 0
+    myIndex1 = myIndex2 = myIndex3 = 0
+    flag1 = flag2 = flag3 = 0
     running = 1
     myYesCenterx = screen.get_rect().centerx 
     myYesCentery = screen.get_rect().centery + 170
     myNoCenterx = screen.get_rect().centerx
     myNoCentery = screen.get_rect().centery + 220
-    save_game()
+    myBackCenterx = screen.get_rect().centerx
+    myBackCentery = screen.get_rect().centery + 300
+    global myScore
+    save_game() # 每次到这儿就保存一下进度
     
     while running:
         clock.tick(60)
@@ -2506,58 +2953,84 @@ def over():
         choicefont = pygame.font.Font('freesansbold.ttf', 28)
         YesText = choicefont.render('Yes, I am brave and I like challenging', True, (100, 0, 0))
         NoText = choicefont.render('No, this game sucks and I am gonna watch some porns', True, (100, 0, 0))
+        backText = choicefont.render('Back to the main menu', True, (0, 0, 0))
         YesText_rect = YesText.get_rect()
         NoText_rect = NoText.get_rect()
-        YesText_rect.centerx = screen.get_rect().centerx 
-        YesText_rect.centery = screen.get_rect().centery + 170
-        NoText_rect.centerx = screen.get_rect().centerx
-        NoText_rect.centery = screen.get_rect().centery + 220
+        backText_rect = backText.get_rect()
+        
+        YesText_rect.centerx = myYesCenterx
+        YesText_rect.centery = myYesCentery
+        NoText_rect.centerx = myNoCenterx
+        NoText_rect.centery = myNoCentery
+        backText_rect.centerx = myBackCenterx
+        backText_rect.centery = myBackCentery
+        
         screen.blit(scoreText, scoreText_rect)
         if flag1 == 0:
             screen.blit(YesText, YesText_rect)
         if flag2 == 0:
             screen.blit(NoText, NoText_rect)
-        
+        if flag3 == 0:
+            screen.blit(backText, backText_rect)
+            
         showlist = list(pygame.mouse.get_pos())
         #对于yes的回答
-        if  showlist[0] > 155 and showlist[0] < 640 and showlist[1] > 500 and showlist[1] < 540:
+        if  showlist[0] > 150 and showlist[0] < 650 and showlist[1] > 500 and showlist[1] < 540:
             myIndex1 += 1
             flag1 = 1
-            if myIndex1 // 4 >= 1 and myIndex1 % 4 == 0:
-                YesText_rect.centerx = myYesCenterx + myX[myIndex1 // 4 - 1]
-                YesText_rect.centery = myYesCentery + myY[myIndex1 // 4 - 1]
-            if myIndex1 > 14:
+            flag2 = 0
+            flag3 = 0
+            if myIndex1 // 5 >= 1 and myIndex1 % 5 == 0:
+                YesText_rect.centerx = myYesCenterx + myX[myIndex1 // 5 - 1]
+                YesText_rect.centery = myYesCentery + myY[myIndex1 // 5 - 1]
+            if myIndex1 > 23:
                 myIndex1 = 0
             screen.blit(YesText, YesText_rect)    
-        else:
-            myIndex1 = 0
-            flag1 = 0
+            
             #对于no的回答
-        if  showlist[0] > 80 and showlist[0] < 730 and showlist[1] > 550 and showlist[1] < 590:
+        elif  showlist[0] > 30 and showlist[0] < 770 and showlist[1] > 550 and showlist[1] < 590:
             myIndex2 += 1
             flag2 = 1
+            flag1 = 0
+            flag3 = 0
             if myIndex2 // 5 >= 1 and myIndex2 % 5 == 0:
                 NoText_rect.centerx = myNoCenterx + myX[myIndex2 // 5 - 1]
                 NoText_rect.centery = myNoCentery + myY[myIndex2 // 5 - 1]
             if myIndex2 > 23:
                 myIndex2 = 0
             screen.blit(NoText, NoText_rect)    
-        else:
-            myIndex2 = 0
+ 
+        elif  showlist[0] > 240 and showlist[0] < 565 and showlist[1] > 635 and showlist[1] < 670:
+            myIndex3 += 1
+            flag3 = 1
+            flag1 = 0
             flag2 = 0
+            if myIndex3 // 5 >= 1 and myIndex3 % 5 == 0:
+                backText_rect.centerx = myBackCenterx + myX[myIndex3 // 5 - 1]
+                backText_rect.centery = myBackCentery + myY[myIndex3 // 5 - 1]
+            if myIndex3 > 23:
+                myIndex3 = 0
+            screen.blit(backText, backText_rect)    
             
+        else:
+            flag1 = 0
+            flag2 = 0
+            flag3 = 0
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 poslist = list(pygame.mouse.get_pos())
-                #print pygame.mouse.get_pos()  # 用于测试选择项的两个端点的坐标的
-                if poslist[0] > 155 and poslist[0] < 640 and poslist[1] > 500 and poslist[1] < 540:
-                    running = 0
-                if poslist[0] > 80 and poslist[0] < 730 and poslist[1] > 550 and poslist[1] < 590:
+                # print pygame.mouse.get_pos()  # 用于测试选择项的两个端点的坐标的
+                if poslist[0] > 150 and poslist[0] < 650 and poslist[1] > 500 and poslist[1] < 540:
+                    return 'continue'
+                if poslist[0] > 30 and poslist[0] < 770 and poslist[1] > 550 and poslist[1] < 590:
                     pygame.quit()
                     exit()
+                if poslist[0] > 240 and poslist[0] < 565 and poslist[1] > 635 and poslist[1] < 670:
+                    return 'back'
         pygame.display.update()
  
 # 开始画面 
@@ -2581,31 +3054,36 @@ def opening():
     myRulesIndex = 0
     myRulesCenterx = screen.get_rect().centerx
     myRulesCentery = screen.get_rect().centery + 150
+    myExitIndex = 0
+    myExitCenterx = screen.get_rect().centerx
+    myExitCentery = screen.get_rect().centery + 250    
     flag_begin = 0
     flag_load = 0
     flag_challenging = 0
     flag_rules = 0
-    
+    flag_exit = 0
+    openingFont = pygame.font.Font('freesansbold.ttf', 50)
+    introFont = pygame.font.Font('freesansbold.ttf', 12)
+    welcomeText = openingFont.render("Welcome to this game!", True, (0, 0, 0))
+    beginText = openingFont.render('New game', True, (0, 0, 0))
+    loadText = openingFont.render('Load game', True, (0, 0, 0))
+    challengingText = openingFont.render('Challenging mode', True, (0, 0, 0))
+    rulesText = openingFont.render('The rules', True, (0, 0, 0))
+    exitText = openingFont.render('Exit', True, (0, 0, 0))
+    introText = introFont.render('Please check  https://github.com/type-coder-engineer  to find more interesting projects by me ^_^', True, (0, 50, 200))
+    introText_rect = introText.get_rect()
+    welcomeText_rect = welcomeText.get_rect()
+    beginText_rect = beginText.get_rect()
+    loadText_rect = loadText.get_rect()
+    challengingText_rect = challengingText.get_rect()
+    rulesText_rect = rulesText.get_rect()
+    exitText_rect = exitText.get_rect()
+        
     while running:
         clock.tick(60)
     
         screen.fill(0)
         screen.blit(background, (0, 0))
-        openingFont = pygame.font.Font('freesansbold.ttf', 50)
-        introFont = pygame.font.Font('freesansbold.ttf', 12)
-        welcomeText = openingFont.render("Welcome to this game!", True, (0, 0, 0))
-        beginText = openingFont.render('New game', True, (0, 0, 0))
-        loadText = openingFont.render('Load game', True, (0, 0, 0))
-        challengingText = openingFont.render('Challenging mode', True, (0, 0, 0))
-        rulesText = openingFont.render('The rules', True, (0, 0, 0))
-        introText = introFont.render('Please check  https://github.com/type-coder-engineer  to find more interesting projects by me ^_^', True, (0, 50, 200))
-
-        introText_rect = introText.get_rect()
-        welcomeText_rect = welcomeText.get_rect()
-        beginText_rect = beginText.get_rect()
-        loadText_rect = loadText.get_rect()
-        challengingText_rect = challengingText.get_rect()
-        rulesText_rect = rulesText.get_rect()
         
         if welcomeDirection == 1:
             myWelcomeCenterx += 3
@@ -2616,6 +3094,7 @@ def opening():
             welcomeDirection = 1
         if myWelcomeCenterx > 500:
             welcomeDirection = 0
+            
         welcomeText_rect.centerx =  myWelcomeCenterx
         welcomeText_rect.centery = screen.get_rect().centery - 270
         beginText_rect.centerx =  screen.get_rect().centerx
@@ -2626,8 +3105,10 @@ def opening():
         challengingText_rect.centery = screen.get_rect().centery + 50            
         rulesText_rect.centerx =  screen.get_rect().centerx
         rulesText_rect.centery = screen.get_rect().centery + 150
+        exitText_rect.centerx =  screen.get_rect().centerx
+        exitText_rect.centery = screen.get_rect().centery + 250
         introText_rect.centerx = screen.get_rect().centerx
-        introText_rect.centery = screen.get_rect().centery + 300
+        introText_rect.centery = screen.get_rect().centery + 315
         screen.blit(welcomeText, welcomeText_rect)
         screen.blit(introText, introText_rect)
         if flag_begin == 0:
@@ -2638,7 +3119,9 @@ def opening():
             screen.blit(challengingText, challengingText_rect)            
         if flag_rules == 0:
             screen.blit(rulesText, rulesText_rect)
-
+        if flag_exit == 0:
+            screen.blit(exitText, exitText_rect)
+            
         showlist = list(pygame.mouse.get_pos())
         if showlist[0] > 275 and showlist[0] < 525 and showlist[1] > 175 and showlist[1] < 225:
             myBeginIndex += 1
@@ -2653,6 +3136,7 @@ def opening():
             flag_load = 0
             flag_challenging = 0
             flag_rules = 0
+            flag_exit = 0
             
             # pygame.display.update()    
         elif showlist[0] > 265 and showlist[0] < 535 and showlist[1] > 275 and showlist[1] < 325:
@@ -2668,6 +3152,7 @@ def opening():
             flag_begin = 0
             flag_rules = 0
             flag_challenging = 0
+            flag_exit = 0
 
         elif showlist[0] > 180 and showlist[0] < 620 and showlist[1] > 375 and showlist[1] < 425:
             myChallengingIndex += 1
@@ -2682,8 +3167,9 @@ def opening():
             flag_begin = 0
             flag_rules = 0
             flag_load = 0
+            flag_exit = 0
 
-        elif showlist[0] > 280 and showlist[0] < 515 and showlist[1] > 475 and showlist[1] < 520:
+        elif showlist[0] > 280 and showlist[0] < 515 and showlist[1] > 475 and showlist[1] < 525:
             myRulesIndex += 1
             flag_rules = 1
             if myRulesIndex // 7 >= 1 and myRulesIndex % 7 == 0:
@@ -2696,11 +3182,29 @@ def opening():
             flag_begin = 0
             flag_challenging = 0
             flag_load = 0
+            flag_exit = 0
+            
+        elif showlist[0] > 355 and showlist[0] < 450 and showlist[1] > 575 and showlist[1] < 625:
+            myExitIndex += 1
+            flag_exit = 1
+            if myExitIndex // 7 >= 1 and myExitIndex % 7 == 0:
+                exitText_rect.centerx = myExitCenterx + myX[myExitIndex // 7 - 1]
+                exitText_rect.centery = myExitCentery + myY[myExitIndex // 7 - 1]
+
+            if myExitIndex > 33:
+                myExitIndex = 1
+            screen.blit(exitText, exitText_rect)   
+            flag_begin = 0
+            flag_challenging = 0
+            flag_load = 0
+            flag_rules = 0
+            
         else:
             flag_begin = 0
             flag_challenging = 0
             flag_load = 0
             flag_rules = 0
+            flag_exit = 0
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -2708,15 +3212,19 @@ def opening():
                 exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 poslist = list(pygame.mouse.get_pos())
-                #print pygame.mouse.get_pos()  # 用于测试选择项的两个端点的坐标的
+                # print pygame.mouse.get_pos()  # 用于测试选择项的两个端点的坐标的
                 if poslist[0] > 275 and poslist[0] < 525 and poslist[1] > 175 and poslist[1] < 225:
                     return 'newgame'
                 elif poslist[0] > 265 and poslist[0] < 535 and poslist[1] > 275 and poslist[1] < 325:
                     return 'loadgame'
                 elif poslist[0] > 180 and poslist[0] < 620 and poslist[1] > 375 and poslist[1] < 425:
                     return 'challengingmode'
-                elif poslist[0] > 280 and poslist[0] < 515 and poslist[1] > 475 and poslist[1] < 520:
+                elif poslist[0] > 280 and poslist[0] < 515 and poslist[1] > 475 and poslist[1] < 525:
                     return 'rules'
+                elif poslist[0] > 355 and poslist[0] < 450 and poslist[1] > 575 and poslist[1] < 625:
+                    pygame.quit()
+                    exit()       
+                    
         pygame.display.update()
 
 # 规则界面
@@ -2744,8 +3252,8 @@ def rules():
         introText1 = introFont.render('You can use direction keys to move your plane, use space to shoot. There is a recharging time for the bullets.', True, (0, 0, 0))
         introText2 = introFont.render('Be careful not to get too close to any enemy, you will risk of being crashed by the airflow between the planes.', True, (0, 0, 0))
         introText3 = introFont.render('There are two kinds of award. If you get the bullet award, you can have unlimited bullets for a while. ', True, (0, 0, 0))
-        introText4 = introFont.render('If you get the bomb award you can tap \'b\' to use it. You can only get at most 3 bombs at one time. A bomb', True, (0, 0, 0))
-        introText5 = introFont.render('can erase all the enemies and their bullets on the screen. It can also make a certain damage to the boss.', True, (0, 0, 0))       
+        introText4 = introFont.render('If you get the bomb award you can tap \'b\' to use it. You can only carry at most 3 bombs at one time. A bomb', True, (0, 0, 0))
+        introText5 = introFont.render('can erase all the enemies and their bullets on the screen. It can also make a certain damage to every boss.', True, (0, 0, 0))       
         introText6 = introFont.render('For the boss You can see its life on the bottom left. Pay attention a boss will have some special attacks! ', True, (0, 0, 0))
         introText7 = introFont.render('And remember every boss has its own pattern, well that\'s for me to know and for you to find out~ LOL ', True, (0, 0, 0))
         introText8 = introFont.render('If you achieve a higher level after the level1, you will be able to reload the game to this level if you are dead.', True, (0, 0, 0)) 
@@ -2835,29 +3343,77 @@ def rules():
 def newgame_main(): 
     player = Player(player_img, player_down_img, player_pos)
     clock = pygame.time.Clock()
+    onelife = 1
+    global myGame 
     
-    level1(clock, player)
-    if myGame != 1:
-        over()
-    else:
-        level2(clock, player)
-        if myGame != 1:
-            over()
+    again = 0 # 为了重玩的时候重新刷新player的参数，如果是直接进如下一关就不用刷新位置弹药信息了
+    flag_saw_boss = 0
+    flag_saw_boss = level1(clock, player, flag_saw_boss, again)
+    while (myGame != 1):
+        again = 1
+        onelife = 0
+        choice = over()
+        if choice == 'back':
+            return
         else:
-            level3(clock, player)
-            if myGame != 1:
-                over()
+            flag_saw_boss = level1(clock, player, flag_saw_boss, again)
+            
+    if myGame == 1:
+        again = 0
+        flag_saw_boss = 0
+        flag_saw_boss = level2(clock, player, flag_saw_boss, again)
+        while (myGame != 1):
+            again = 1
+            choice = over()
+            if choice == 'back':
+                return
             else:
-                level4(clock, player)
-                if myGame != 1:
-                    over()
-                else:
-                    level5(clock, player)
-                    if myGame != 1:
-                        over()
-                    else:
-                        congraduation_onelife()                    
-
+                flag_saw_boss = level2(clock, player, flag_saw_boss, again)
+                
+    if myGame == 1:
+        again = 0
+        flag_saw_boss = 0
+        flag_saw_boss = level3(clock, player, flag_saw_boss, again)
+        while (myGame != 1):
+            again = 1
+            onelife = 0
+            choice = over()
+            if choice == 'back':
+                return
+            else:
+                flag_saw_boss = level3(clock, player, flag_saw_boss, again)
+                
+    if myGame == 1:
+        again = 0
+        flag_saw_boss = 0
+        flag_saw_boss = level4(clock, player, flag_saw_boss, again)
+        while (myGame != 1):
+            again = 1
+            onelife = 0
+            choice = over()
+            if choice == 'back':
+                return
+            else:
+                flag_saw_boss = level4(clock, player, flag_saw_boss, again)
+                
+    if myGame == 1:
+        again = 0
+        flag_saw_boss = 0
+        flag_saw_boss = level5(clock, player, flag_saw_boss, again)
+        while (myGame != 1):
+            again = 1
+            onelife = 0
+            choice = over()
+            if choice == 'back':
+                return
+            else:
+                flag_saw_boss = level5(clock, player, flag_saw_boss, again)                 
+        
+        if onelife == 1:
+            congraduation_onelife()
+        elif myGame == 1:
+            congraduation()
+            
 # 选择加载游戏界面                     
 def loadGame():
     running = 1
@@ -3058,56 +3614,142 @@ def load_main(level):
     clock = pygame.time.Clock()
     
     if level == 2:
-        level2(clock, player)
-        if myGame != 1:
-            over()
-        else:
-            level3(clock, player)
-            if myGame != 1:
-                over()
+        again = 0 # 为了重玩的时候重新刷新player的参数，如果是直接进如下一关就不用刷新位置弹药信息了
+        flag_saw_boss = 0
+        flag_saw_boss = level2(clock, player, flag_saw_boss, again)
+        while (myGame != 1):
+            again = 1
+            onelife = 0
+            choice = over()
+            if choice == 'back':
+                return
             else:
-                level4(clock, player)
-                if myGame != 1:
-                    over()
+                flag_saw_boss = level2(clock, player, flag_saw_boss, again)
+                    
+        if myGame == 1:
+            again = 0
+            flag_saw_boss = 0
+            flag_saw_boss = level3(clock, player, flag_saw_boss, again)
+            while (myGame != 1):
+                again = 1
+                onelife = 0
+                choice = over()
+                if choice == 'back':
+                    return
                 else:
-                    level5(clock, player)
-                    if myGame != 1:
-                        over()
-                    else:
-                        congraduation()
-                        
-    elif level == 3:
-        level3(clock, player)
-        if myGame != 1:
-            over()
-        else:
-            level4(clock, player)
-            if myGame != 1:
-                over()
-            else:
-                level5(clock, player)
-                if myGame != 1:
-                    over()
+                    flag_saw_boss = level3(clock, player, flag_saw_boss, again)
+                    
+        if myGame == 1:
+            again = 0
+            flag_saw_boss = 0
+            flag_saw_boss = level4(clock, player, flag_saw_boss, again)
+            while (myGame != 1):
+                again = 1
+                onelife = 0
+                choice = over()
+                if choice == 'back':
+                    return
                 else:
-                    congraduation()
-                        
-    elif level == 4:
-        level4(clock, player)
-        if myGame != 1:
-            over()
-        else:
-            level5(clock, player)
-            if myGame != 1:
-                over()
+                    flag_saw_boss = level4(clock, player, flag_saw_boss, again)
+                    
+        if myGame == 1:
+            again = 0
+            flag_saw_boss = 0
+            flag_saw_boss = level5(clock, player, flag_saw_boss, again)
+            while (myGame != 1):
+                again = 1
+                onelife = 0
+                choice = over()
+                if choice == 'back':
+                    return
+                else:
+                    flag_saw_boss = level5(clock, player, flag_saw_boss, again)    
+            
+            congraduation()
+         
+    if level == 3:
+        again = 0 # 为了重玩的时候重新刷新player的参数，如果是直接进如下一关就不用刷新位置弹药信息了
+        flag_saw_boss = 0
+        flag_saw_boss = level3(clock, player, flag_saw_boss, again)
+        while (myGame != 1):
+            again = 1
+            onelife = 0
+            choice = over()
+            if choice == 'back':
+                return
             else:
-                congraduation()
-                
-    elif level == 5:
-        level5(clock, player)
-        if myGame != 1:
-            over()
-        else:
-            congraduation() 
+                flag_saw_boss = level3(clock, player, flag_saw_boss, again)
+                    
+        if myGame == 1:
+            again = 0
+            flag_saw_boss = 0
+            flag_saw_boss = level4(clock, player, flag_saw_boss, again)
+            while (myGame != 1):
+                again = 1
+                onelife = 0
+                choice = over()
+                if choice == 'back':
+                    return
+                else:
+                    flag_saw_boss = level4(clock, player, flag_saw_boss, again)
+                    
+        if myGame == 1:
+            again = 0
+            flag_saw_boss = 0
+            flag_saw_boss = level5(clock, player, flag_saw_boss, again)
+            while (myGame != 1):
+                again = 1
+                onelife = 0
+                choice = over()
+                if choice == 'back':
+                    return
+                else:
+                    flag_saw_boss = level5(clock, player, flag_saw_boss, again)    
+            
+            congraduation()
+          
+    if level == 4:
+        again = 0 # 为了重玩的时候重新刷新player的参数，如果是直接进如下一关就不用刷新位置弹药信息了
+        flag_saw_boss = 0
+        flag_saw_boss = level4(clock, player, flag_saw_boss, again)
+        while (myGame != 1):
+            again = 1
+            onelife = 0
+            choice = over()
+            if choice == 'back':
+                return
+            else:
+                flag_saw_boss = level4(clock, player, flag_saw_boss, again)
+                    
+        if myGame == 1:
+            again = 0
+            flag_saw_boss = 0
+            flag_saw_boss = level5(clock, player, flag_saw_boss, again)
+            while (myGame != 1):
+                again = 1
+                onelife = 0
+                choice = over()
+                if choice == 'back':
+                    return
+                else:
+                    flag_saw_boss = level5(clock, player, flag_saw_boss, again)    
+            
+            congraduation()
+            
+    if level == 5:
+        again = 0 # 为了重玩的时候重新刷新player的参数，如果是直接进如下一关就不用刷新位置弹药信息了
+        flag_saw_boss = 0
+        flag_saw_boss = level5(clock, player, flag_saw_boss, again)
+        while (myGame != 1):
+            again = 1
+            onelife = 0
+            choice = over()
+            if choice == 'back':
+                return
+            else:
+                flag_saw_boss = level5(clock, player, flag_saw_boss, again)
+                       
+        congraduation()
 
 # 一条命过关的祝贺画面            
 def congraduation_onelife():
@@ -3310,7 +3952,8 @@ def load_game():
 if __name__ == '__main__': 
     global pass_level
     load_game()
-
+    # pass_level = 5  # for test
+    
     while(1):
         choice = opening()
         if choice == "rules":
