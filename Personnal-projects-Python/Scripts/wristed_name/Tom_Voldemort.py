@@ -39,13 +39,13 @@ def compare(name1, name2):
     return int((1 - float(bias)/base)*100)  # 注意这里必须要将bias或base其中一个变成float，不然算出来的不是一个小数
 
 # 用于输入两个名字并计算相似度    
-def find_resemblence():
+def find_resemblance():
     name1 = raw_input('The first name?\n')
     name1 = pretreatment(name1)
     name2 = raw_input('The second name?\n')
     name2 = pretreatment(name2)
     res = compare(name1, name2)
-    print 'The resemblence of these two names is ', res, '%' 
+    print 'The resemblance of these two names is ', res, '%' 
 
 # 用于把txt文件中男性名字提取出来
 def extract_first_name_m():
@@ -93,10 +93,10 @@ def extract_second_name():
 def find_name():
     potential_f = []
     given_name = raw_input('The name?\n')
-    given_resemblence = int(raw_input('The resemblence you want?\n'))
+    given_resemblence = int(raw_input('The resemblance you want?\n'))
     while given_resemblence > 100 or given_resemblence < 0:
-        print 'The resemblence should be between 0 and 100...'
-        given_resemblence = int(raw_input('The resemblence you want?\n'))
+        print 'The resemblance should be between 0 and 100...'
+        given_resemblence = int(raw_input('The resemblance you want?\n'))
         
     potential_m = search_name_m( given_name, given_resemblence)
     potential_f = search_name_f( given_name, given_resemblence) 
@@ -162,7 +162,7 @@ def search_name_f( given_name, given_resemblence):
     pbar_f.finish()
     return potential_f
 
-# 用于剔除国语相似的结果 
+# 用于剔除过于相似的结果 
 def delete_too_favor(name, list):
     name = name.upper()
     names = name.split(' ')
@@ -189,5 +189,14 @@ def delete_too_favor(name, list):
     
 if __name__ == '__main__':
     os.system("cls")
-    # find_resemblence()
-    find_name()
+    choice = ''
+    while('resem' not in choice and 'name' not in choice):
+        choice = raw_input('You want to find the resemblance of two names or find the resemblant names? Tap ''resemblance'' or ''name'' to choose\n')
+    if 'resem' in choice: 
+        find_resemblance()
+    else:
+        find_name()
+    
+    
+    
+    
