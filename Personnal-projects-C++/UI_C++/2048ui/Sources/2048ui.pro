@@ -21,5 +21,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-RESOURCES += \
-    resources.qrc
+DISTFILES += \
+    2048.rc
+
+RC_FILE = 2048.rc

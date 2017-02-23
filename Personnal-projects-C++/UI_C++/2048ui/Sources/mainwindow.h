@@ -52,7 +52,6 @@ private:
     Ui::MainWindow *ui;
     QTimer mycount; //  注意尽量避免用指针，因为指针一定要初始化，不然会报错
     app_2048 mygame; // 在mainwindow.h中初始化game即可，同样尽量避免指针！！
-    int permit;
 
     QAction* new_game_action;
     QAction* rank_action;
@@ -67,8 +66,7 @@ private:
     int break_flag;
     int myowntimer;
     int game_begin;
-    int game_over;
-    int flag2048;
+    int game_end;
     QString time_record_name;
     QString number_record_name;
     QToolBar *mytoolbar;
@@ -80,7 +78,7 @@ private:
     void update_view();
     void choosetohide(QLCDNumber *lcd, int x);
     void keyPressEvent(QKeyEvent *qke);
-    void showreminder();
+    void show_reminder();
     void create_actions();
     void create_menus();
     void read_settings();

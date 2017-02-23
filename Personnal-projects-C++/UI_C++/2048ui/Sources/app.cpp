@@ -10,166 +10,176 @@
 using std::vector;
 
 // 上下左右移动的算法
-void app_2048::calculate_up(){
-    for (int j = 0; j != L; ++j){
-        for (int i = 1; i != H; ++i){
-            if (map[i][j] != 0){
-                while((i - 1 != -1)&& (map[i - 1][j] == 0)){
-                    swap(map[i][j], map[i - 1][j]);
-                    --i;
+bool app_2048::calculate_up(){
+    bool action = false;
+    for (int col = 0; col != L; ++col){
+        int flag_times = 1;
+        int times = 0;
+        if (map[0][col] == map[1][col] && map[1][col] != 0 && map[2][col] == map[3][col] && map[3][col] != 0)
+            flag_times = 2;
+        for (int row = 1; row != H; ++row){
+            if (map[row][col] != 0){
+                while((row - 1 >= 0) && (map[row - 1][col] == 0)){
+                    action = true;
+                    swap(map[row][col], map[row - 1][col]);
+                    --row;
                 }
-                if ((i - 1 != -1) && (map[i - 1][j] == map[i][j])){
-                    map[i - 1][j] = map[i - 1][j] * 2;
-                    map[i][j] = 0;
-                }
-            }
-        }
-    }
-}
-
-void app_2048::calculate_down(){
-    for (int j = 0; j != L; ++j){
-        for (int i = H - 2; i != -1; --i){
-            if(map[i][j] != 0){
-                while((i + 1 != H) && (map[i + 1][j] == 0)){
-                    swap(map[i][j], map[i + 1][j]);
-                    ++i;
-                }
-                if ((i + 1 != H) && (map[i + 1][j] == map[i][j])){
-                    map[i + 1][j] = map[i + 1][j] * 2;
-                    map[i][j] = 0;
-                }
-            }
-        }
-    }
-}
-
-void app_2048::calculate_left(){
-    for (int i = 0; i != H; ++i){
-        for (int j = 1; j != L; ++j){
-            if(map[i][j] != 0){
-                while((map[i][j - 1] == 0) && (j - 1 != -1)){
-                    swap(map[i][j], map[i][j - 1]);
-                    --j;
-                }
-                if ((j - 1 != -1) && (map[i][j - 1] == map[i][j])){
-                    map[i][j - 1] = map[i][j - 1] * 2;
-                    map[i][j] = 0;
-                }
-            }
-        }
-    }
-}
-
-void app_2048::calculate_right(){
-    for (int i = 0; i != H; ++i){
-        for (int j = L - 2; j != -1; --j){
-            if(map[i][j] != 0){
-                while((j + 1 != L) && (map[i][j + 1] == 0)){ // 注意这边一定要把(j + 1 != L)这种判断条件放在前面，不然在数组中就是下标越界。
-                    swap(map[i][j], map[i][j + 1]);
-                    ++j;
-                }
-                if((j + 1 != L) && (map[i][j + 1] == map[i][j])){ // 这边同样的道理，要在if中加上防止下标越界的条件(j + 1 != L)
-                    map[i][j + 1] = map[i][j + 1] * 2;
-                    map[i][j] = 0;
-                }
-            }
-        }
-    }
-}
-//**************************************************
-// 产生新的数字
-void app_2048::newnum(){
-    int *res = 0;
-    int fill = 1;
- //   int count = 0;
-    for(int i = 0; i != H; ++i){
-        res = std::find(map[i], map[i] + L, 0);
-        if (res != map[i] + L){
-            fill = 0;
-            break;
-        }
-        else
-            continue;
-    } // 注意这边要加一个这种判断是不是数字满了的步骤，不然下面的while会进入死循环
-
-    if(fill == 0){
-        int x = rand()%H;    //产生数字
-        int y = rand()%L;
-        while(map[x][y] != 0){
-            x = rand()%H;    //产生数字
-            y = rand()%L;
-        }
-// 本来这里是有一个出现的数字不是2而是场上最小的数字的算法的，但是发现这样就过于简单了，所以就去掉了
-//        int base = basicnum * 4;  // 注意这边和MATLAB不一样，4次方不能用^
-
-//        // 如果之后场上只有4或4以上的，那么新出现的数就不是2了，最大会直接出现8
-//        for (int j = 0; j != L; ++j){
-//            for (int i = 0; i != H; ++i){
-//                if (map[i][j] != 0){
-//                    ++count;
-//                    base = issmaller(map[i][j], base);
-//                }
-//            }
-//        }
-//        if (count != 1) // 防止一开始的两个数直接加起来就只直接变成4了。
-//            map[x][y] = base;
-//        else
-//            map[x][y] = basicnum;
-        map[x][y] = basicnum;
-    }
-}
-
-// 判断游戏是否结束了
-int app_2048::det(){
-    int *res = 0; //用来寻找有没有0的指针
-    int fill = 1;
-    vector<int> range;
-    for(int i = 0; i != H; ++i){
-        range.push_back(i);
-    }
-
-    for(int i = 0; i != H; ++i){
-        res = std::find(map[i], map[i] + L, 0);
-        if (res != map[i] + L){
-            fill = 0;
-            return 0;
-        }
-        else
-            continue;
-    }
-    // 判断的标准是先看看是不是数字全满了，然后再看每个数字的上下左右是不是有相同可以运算的，如果全满加上没有数字可以和周围的运算了即表示游戏结束
-    if (fill == 1){
-        for(int x = 0; x != H; ++x){
-            for(int y = 0; y != L; ++y){
-                for (int x1 = x - 1; x1 != x + 2; ++x1){
-                    for (int y1 = y - 1; y1 != y + 2; ++y1){ // 4个for，前两个是为了遍历每个元素，后两个是为了每个元素的前后
-                        if (x1 != x || y1 != y){
-                            if(x + y == x1 + y1 + 1 || x + y == x1 + y1 - 1){ // 这个if是为了比较的值是上下左右，而不考虑角四个上的值
-                                vector<int>::iterator it1 = std::find(range.begin(), range.end(), x1);
-                                vector<int>::iterator it2 = std::find(range.begin(), range.end(), y1);
-
-                                if (it1 != range.end() && it2 != range.end()){ // 这个if是为了确认比较的范围在矩阵中
-                                    if (map[x1][y1] == map[x][y]){
-                                        return 0;
-                                    }
-                                }
-                            }
-                        }
+                if ((row - 1 >= 0) && (map[row - 1][col] == map[row][col])){
+                    if (times < flag_times){
+                        action = true;
+                        map[row - 1][col] *= 2;
+                        map[row][col] = 0;
+                        times += 1;
                     }
                 }
             }
         }
-        // 释放内存空间
-        for(int i = 0; i != H; ++i){
-            delete []map[i];
-        }
-        delete []map;
-
-        return 1;
     }
+    return action;
+}
+
+bool app_2048::calculate_down(){
+    bool action = false;
+    for (int col = 0; col != L; ++col){
+        int flag_times = 1;
+        int times = 0;
+        if (map[0][col] == map[1][col] && map[1][col] != 0 && map[2][col] == map[3][col] && map[3][col] != 0)
+            flag_times = 2;
+        for (int row = H - 2; row != -1; --row){
+            if (map[row][col] != 0){
+                while((row + 1 <= H - 1) && (map[row + 1][col] == 0)){
+                    action = true;
+                    swap(map[row][col], map[row + 1][col]);
+                    ++row;
+                }
+                if ((row + 1 <= H - 1) && (map[row + 1][col] == map[row][col])){
+                    if (times < flag_times){
+                        action = true;
+                        map[row + 1][col] *= 2;
+                        map[row][col] = 0;
+                        times += 1;
+                    }
+                }
+            }
+        }
+    }
+    return action;
+}
+
+bool app_2048::calculate_left(){
+    bool action = false;
+    for (int row = 0; row != H; ++row){
+        int flag_times = 1;
+        int times = 0;
+        if (map[row][0] == map[row][1] && map[row][1] != 0 && map[row][2] == map[row][3] && map[row][3] != 0)
+            flag_times = 2;
+        for (int col = 1; col != L; ++col){
+            if (map[row][col] != 0){
+                while((col - 1 >= 0) && (map[row][col - 1] == 0)){
+                    action = true;
+                    swap(map[row][col], map[row][col - 1]);
+                    --col;
+                }
+                if ((col - 1 >= 0) && (map[row][col - 1] == map[row][col])){
+                    if (times < flag_times){
+                        action = true;
+                        map[row][col - 1] *= 2;
+                        map[row][col] = 0;
+                        times += 1;
+                    }
+                }
+            }
+        }
+    }
+    return action;
+}
+
+bool app_2048::calculate_right(){
+    bool action = false;
+    for (int row = 0; row != H; ++row){
+        int flag_times = 1;
+        int times = 0;
+        if (map[row][0] == map[row][1] && map[row][1] != 0 && map[row][2] == map[row][3] && map[row][3] != 0)
+            flag_times = 2;
+        for (int col = L - 2; col != -1; --col){
+            if (map[row][col] != 0){
+                while((col + 1 <= L - 1) && (map[row][col + 1] == 0)){
+                    action = true;
+                    swap(map[row][col], map[row][col + 1]);
+                    ++col;
+                }
+                if ((col + 1 <= L - 1) && (map[row][col + 1] == map[row][col])){
+                    if (times < flag_times){
+                        action = true;
+                        map[row][col + 1] *= 2;
+                        map[row][col] = 0;
+                        times += 1;
+                    }
+                }
+            }
+        }
+    }
+    return action;
+}
+//**************************************************
+bool app_2048::isFull(){
+    for (int row = 0; row != H; ++row){
+        for (int col = 0; col != L; ++col){
+            if (map[row][col] == 0)
+                return false;
+        }
+    }
+    return true;
+}
+
+// 产生新的数字
+void app_2048::newnum(){
+    if (isFull())
+        return;// 注意这边要加一个这种判断是不是数字满了的步骤，不然下面的while会进入死循环
+
+    int x = rand()%H;    //产生数字
+    int y = rand()%L;
+    while(map[x][y] != 0){
+        x = rand()%H;    //产生数字
+        y = rand()%L;
+    }
+    int option = rand()%10;
+    if (option == 0)
+        map[x][y] = basicnum*2;
     else
+        map[x][y] = basicnum;
+    return;
+}
+
+// 判断游戏是否结束了
+int app_2048::det(){
+//    if (map[0][0] == 2)
+//        return 1;
+// 测试结束功能用的
+
+    if (!isFull())
         return 0;
+
+    for (int row = 0; row != H; ++row){
+        for (int col = 0; col != L; ++col){
+            if (row < H - 1){
+                if (map[row][col] == map[row + 1][col])
+                    return 0;
+            }
+            if (col < L - 1){
+                if (map[row][col] == map[row][col + 1])
+                    return 0;
+            }
+        }
+    }
+    // 释放内存空间
+    for(int i = 0; i != H; ++i){
+        delete []map[i];
+    }
+    delete []map;
+
+    return 1;
+
 }
 
 // 初始化，出现一开始的两个数字
@@ -212,6 +222,10 @@ int app_2048::biggest(){
         }
     }
     return res;
+}
+
+int app_2048::show_map(const int i, const int j){
+    return map[i][j];
 }
 
 

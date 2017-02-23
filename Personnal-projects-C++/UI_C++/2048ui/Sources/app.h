@@ -8,20 +8,25 @@ private:
     const int H = 4;
     const int L = 4;
     const int basicnum = 2;
+    int **map;
 
 public:
-    int **map;
     app_2048() = default; //注意构造函数的名字要和class一样！！
     inline void swap(int &a, int &b) const;
     inline int issmaller(int &a, int &b) const;
-    void calculate_up();
-    void calculate_down();
-    void calculate_left();
-    void calculate_right();
+    bool calculate_up();
+    bool calculate_down();
+    bool calculate_left();
+    bool calculate_right();
     void newnum();
     int det();
     void init();
     int biggest();
+    int show_map(const int i, const int b);
+
+private:
+    bool isFull();
+
 };
 
 inline void app_2048::swap(int &a, int &b) const{
