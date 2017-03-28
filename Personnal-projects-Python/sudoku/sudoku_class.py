@@ -6,32 +6,9 @@ import time
 def shuffling(all):
     new_list = all[:]
     for index in xrange(1, len(all)):
-        index_exc = random.randint(0, index)
+        index_exc = random.randint(index)
         new_list[index], new_list[index_exc] = new_list[index_exc], new_list[index]
     return new_list
-
-# 将map打印出来
-def print_map(map):
-    print '-'*45
-    print '|',
-    for index in xrange(81):
-        if map[index] != 0:
-            print map[index], '|',
-        else:
-            print ' ', '|',
-        if (index + 1) % 3 == 0 and (index + 1) % 9 != 0:
-            print ', |', 
-        if (index + 1) % 9 == 0 and (index + 1) % 27 != 0:
-            print ''
-            print '- '*23
-            print '|',
-        if (index + 1) % 27 == 0:
-            print ' '
-            print '-'*45
-            if index != 80:
-                print '-'*45
-                print '|',
-    return
  
 # 用于生成数独终盘的时候判断每个空格不能填入的数字
 def limit_generate(map, row, col):
@@ -59,8 +36,8 @@ def limit_generate(map, row, col):
 def sudoku_final():
     stack_options = [] # 这是一个stack结构，lifo
     all = range(1, 10)
-    map = [0 for pos in xrange(81)]
-    map[:9] = shuffling(all) # 注意这里是map[:9]!! 一开始写成:10了，导致map的长度被我减了1
+    map = [0 for index in xrange(81)]
+    map[:9] = shuffling(all)
     index = 9
     
     while(index < 81):
@@ -110,26 +87,36 @@ def limit_solve(map, row, col):
  
 # 检查数独题目是否有问题
 def puzzle_verify(puzzle):
+    nb_blanks = 0
+    for row in xrange(9):
+        for col in xrange(9):
+            if puzzle[row*9 + col] == 0:
+                nb_blanks += 1
+    if nb_blanks > 64:
+        return False
+
     for row in xrange(9):
         list_col = []
         for col in xrange(9):
             if puzzle[row*9 + col] == 0:
                 pass
             else:
-                if puzzle[row*9 + col] in list_col:
+                if puzzle[row*9 + col] in list_col or puzzle[row*9 + col] > 9 or puzzle[row*9 + col] < 0:
                     return False
                 else:
                     list_col.append(puzzle[row*9 + col])
+                    
     for col in xrange(9):
         list_row = []
         for row in xrange(9):
             if puzzle[row*9 + col] == 0:
                 pass
             else:
-                if puzzle[row*9 + col] in list_row:
+                if puzzle[row*9 + col] in list_row or puzzle[row*9 + col] > 9 or puzzle[row*9 + col] < 0:
                     return False
                 else:
                     list_row.append(puzzle[row*9 + col]) 
+                    
     for pos in [(0, 0), (3, 0), (6, 0), (0, 3), (3, 3), (6, 3), (0, 6), (3, 6), (6, 6)]:  
         list_ele = []
         for i in xrange(3):
@@ -145,9 +132,6 @@ def puzzle_verify(puzzle):
 
 # 得到数独的解    
 def sudoku_solving(puzzle):
-    if not puzzle_verify(puzzle):
-        print 'Not a valid puzzle...'
-        return
     map_solved = []
     pos_blank = []
     stack_options = []
@@ -159,7 +143,6 @@ def sudoku_solving(puzzle):
     index = 0
     origin = puzzle[:]
     flag_over = False
-    print_map(origin)
     
     while(1):
         row = pos_blank[index] // 9
@@ -182,7 +165,8 @@ def sudoku_solving(puzzle):
                     else:
                         first_option = one[:]
                         break
-                
+                if not first_option:
+                    break
                 puzzle[pos_blank[index] + 1:] = origin[pos_blank[index] + 1:]
                 puzzle[pos_blank[index]] = first_option.pop(0)
                 stack_options = [first_option]
@@ -207,29 +191,7 @@ def sudoku_solving(puzzle):
             puzzle[pos_blank[index]] = last_options.pop(0)
             stack_options.append(last_options)
             index += 1
-    if len(map_solved) == 1:
-        print_map(map_solved[0])
-    elif len(map_solved) > 1:
-        for index in xrange(len(map_solved)):
-            print_map(map_solved[index])
-            print '***************'
-        print 'Not unique solution'
-    else:
-        print 'No solution...'
-    return
-
-# 从'puzzle.txt'文件得到数独题目   
-def get_puzzle():
-    puzzle = []
-    target = open('puzzle.txt')
-    for line in target:
-        line.strip('\n')
-        content = line.split(' ')
-        for one in content:
-            if one != ' ' and one != '':
-                puzzle.append(int(one))
-    # print puzzle
-    return puzzle
+    return map_solved
 
 # 在数独终盘上随机挖去数字形成题目    
 def dibble(final, level):
@@ -297,12 +259,10 @@ def sudoku_verify(test):
                 for one in stack_options:
                     if len(one) == 0:
                         index += 1
-                        if index == blank_nb:
-                            flag_over = True
                     else:
                         first_option = one[:]
                         break
-                if flag_over:
+                if not first_option:
                     break
                 puzzle[pos_blank[index] + 1:] = origin[pos_blank[index] + 1:]
                 puzzle[pos_blank[index]] = first_option.pop(0)
@@ -329,38 +289,17 @@ def sudoku_verify(test):
         return False
 
 # 生成数独题目        
-def sudoku_puzzle(level):
-    if level != 1 and level != 2 and level != 3:
-        print 'Invalid level...'
-        return
-    print 'Generating the puzzle...'
-    map_final = sudoku_final()
-    save_answer(map_final)
+def sudoku_puzzle(final, level):
+    map_final = final[:]
     puzzle = dibble(map_final, level)
     list_notGood = []
-    print 'Testing this puzzle, please wait...\n'
     while (not sudoku_verify(puzzle)):
         list_notGood.append(puzzle)
         while(puzzle in list_notGood):
             puzzle = dibble(map_final, level)
-    print 'Here is your puzzle, have fun!\n'
     return puzzle
-
-# 生成题目的同时将答案保存到'answer.txt'文件中参考
-def save_answer(final):
-    target = open('answer.txt','w')
-    for index in xrange(81):
-        target.write(str(final[index]))
-        target.write('  ')
-        if (index + 1) % 9 == 0 and index != 80:
-            target.write('\n')
-    target.close()
-    return 
     
-if __name__ == '__main__':
-    start = time.time()
-    # sudoku_solving(get_puzzle())
-    print_map(sudoku_puzzle(1))
-    end = time.time()
-    print "it took {} seconds".format(end - start)
     
+    
+    
+        
