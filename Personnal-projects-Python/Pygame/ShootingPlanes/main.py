@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-@author: Leo
-@optimised by ZHANG Chenyu
+@author: ZHANG Chenyu
 """
 
 import pygame

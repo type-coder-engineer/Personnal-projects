@@ -2,8 +2,7 @@
 """
 Created on Wed Sep 11 16:36:03 2013
 
-@author: Leo
-@optimised by ZHANG Chenyu
+@author: ZHANG Chenyu
 """
 
 import pygame
