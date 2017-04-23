@@ -14,18 +14,29 @@ def main(filename, transparency):
         print transparency
         return
     else:
+        if filename[-3:] != 'png':
+            im = Image.open(filename)
+            targetName = filename[:-4] + '.' + 'png'
+            im.convert('RGBA').save(targetName)
+            os.remove(filename)
+        else:
+            im = Image.open(filename)
+            if im.mode != 'RGBA':
+                im.convert('RGBA').save(filename)
+            im.close()
+            targetName = filename
         transparency = int(transparency)
         rate = int(255 * transparency / 100)
-        newname = filename[:-4] + '_' + str(transparency) + '%' + filename[-4:]
-        shutil.copy(filename, newname)
-        target = Image.open(newname)
+        newName = targetName[:-4] + '_' + str(transparency) + '%' + targetName[-4:]
+        shutil.copy(targetName, newName)
+        target = Image.open(newName)
         data = target.getdata()
-        newdata = []
+        newData = []
         for i in data:
-            newdata.append((i[0], i[1], i[2], rate))
+            newData.append((i[0], i[1], i[2], rate))
         
-        target.putdata(newdata)
-        target.save(newname)
+        target.putdata(newData)
+        target.save(newName)
         print 'All done!'
     
 if __name__ == '__main__':
