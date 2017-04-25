@@ -22,9 +22,9 @@ pygame.display.set_caption('2K17')
 background = pygame.image.load('2K17_20%.png').convert_alpha() # 要用convert_alpha如果你的图片的
 # alpha通道不是255，然后你的背景颜色要设为白色，不然图片半透明后就变黑了
 
-# allTeams = ['热火', '雷霆', '马刺', '勇士', '步行者', '篮网', '开拓者', '小牛', '凯尔特人', '森林狼', '灰熊', '奇才', '鹈鹕', '掘金', '76人', '太阳', '活塞', '猛龙',\
-# '魔术', '老鹰', '爵士', '雄鹿', '骑士', '黄蜂', '公牛', '尼克斯', '快船', '火箭', '国王', '湖人']
-allTeams =['1', '2', '3', '4', '5']
+allTeams = ['热火', '雷霆', '马刺', '勇士', '步行者', '篮网', '开拓者', '小牛', '凯尔特人', '森林狼', '灰熊', '奇才', '鹈鹕', '掘金', '76人', '太阳', '活塞', '猛龙',\
+'魔术', '老鹰', '爵士', '雄鹿', '骑士', '黄蜂', '公牛', '尼克斯', '快船', '火箭', '国王', '湖人']
+# allTeams =['1', '2', '3', '4', '5']
 
 def opening():
     running = 1
@@ -149,7 +149,7 @@ def show(chosenTeams):
     for one in order:
         mylist.append(allTeams[one])
     
-    print mylist
+    # print mylist
     myIndex1 = 0
     myIndex2 = 1
     myIndex3 = 2
