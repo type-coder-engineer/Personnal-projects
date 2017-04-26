@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-# import sys
+'''
+当时看完西部世界发现里面两个人的名字是同样字母重新排列的，所以写了这么一个脚本来比较两个
+名字的相似度，名字来源于哈利波特中的汤姆里德尔
+还有两个txt文件中是常见的姓和名，用于寻找一个打乱顺序的名字
+'''
+
 from progressbar import *
 import os
 
@@ -170,29 +175,22 @@ def delete_too_favor(name, list):
     for one in names:
         name += one
     list_remove = [] # 注意这里要建立一个list储存要删去的元素，不能直接在循环里删除list中的元素
-    # print len(list)
     for i in range(0, len(name) - 2):
-        # print name[i:i+3]
-        # print list_remove
-        # print len(list_remove)
         for one in list:
             if name[i:i+3] in one:
                 if one not in list_remove:  # 要确认每个元素是唯一的
                     list_remove.append(one)
-                # print list
             else:
                 pass
     for one in list_remove:
         list.remove(one)
-    # print len(list)
     return
     
 if __name__ == '__main__':
-    os.system("cls")
     choice = ''
     while('resem' not in choice and 'name' not in choice):
         choice = raw_input('You want to find the resemblance of two names or find the resemblant names? Tap ''resemblance'' or ''name'' to choose\n')
-    if 'resem' in choice: 
+    if 'resemblance' in choice: 
         find_resemblance()
     else:
         find_name()

@@ -1,42 +1,76 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
-# 每次可以保存一个文件，如果有同名文件就取代，一开始会新建一个backup目录
-#在终端中run: backup.py filename 即可
+'''
+一开始如果没有backup目录会新建一个backup目录
+每次可以备份多个个文件，或者使用python backup.py all type 来备份所有该
+类型的文件，已有的文件会被覆盖
+在终端中run: python backup.py filename 即可
 
+To backup the files you mention or all the files of same type in the dir 'backup'
+'''
 import sys, os
 import shutil
 
-def backup(file):
-    if os.path.isdir(mydes):
-        cleanup(file)
+def backup(files):
+    if os.path.isdir(myDes):
+        cleanupOriginal(files)
     else:
-        os.mkdir(os.path.join(mypath, mydes))
-    os.chdir(mypath)
-    shutil.copy(file, mydes)
-    
-def cleanup(file):
-    filenames = os.listdir(mydes)
-    os.chdir(os.path.join(mypath, mydes))
-    for name in filenames:
+        os.mkdir(os.path.join(myPath, myDes))
+    os.chdir(myPath)
+    for file in files:
         try:
-            if name == file:
+            shutil.copy(file, myDes)
+        except:
+            print 'Error with the file " {} " during the copy'.format(file)
+    print 'All done!'
+    info()
+    
+def cleanupOriginal(targetFiles):
+    fileNames = os.listdir(myDes)
+    os.chdir(os.path.join(myPath, myDes))
+    for name in fileNames:
+        try:
+            if name in targetFiles:
                 os.remove(name)
             else:
                 pass
         except:
-            print 'Unknown mistakes during the cleanup...'
+            print 'Error with the file " {} "during the cleanup'.format(name)
+
+def backupAll(targets):
+    allFiles = os.listdir(myPath)
+    targetFiles = []
+    for file in allFiles:
+        index = file.find('.')
+        if index != -1 and index <= len(file) - 2:
+            if file[index + 1:] in targets:
+                targetFiles.append(file)
+            else:
+                pass
+        else:
+            pass
+    backup(targetFiles)
             
 def info():
-    filenames = os.listdir(mydes)
-    os.chdir(os.path.join(mypath, mydes))
+    filenames = os.listdir(myDes)
+    os.chdir(os.path.join(myPath, myDes))
     print "Now you have: ",
     for name in filenames:
         print name + "  ",
     print "as the backup document(s)"
     
 if __name__ == '__main__':
-    mypath = os.getcwd()
-    mydes = 'backup'
-    backup(sys.argv[1])
-    print 'All done!'
-    info()
+    myPath = os.getcwd()
+    myDes = 'backup'
+    if len(sys.argv) < 2:
+        print 'Wrong input...'
+    else:
+        if sys.argv[1] != 'all':
+            backup(sys.argv[1:])
+        else:
+            if len(sys.argv) == 2:
+                print 'Not enough inputs...'
+            else:
+                backupAll(sys.argv[2:])    
+    
+    
+    

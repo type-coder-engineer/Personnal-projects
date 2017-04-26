@@ -1,5 +1,10 @@
-# coding:utf-8
-# 用于背单词的小程序，可以将单词本中不认识的单词整理到一个resume.txt的文件中去
+# coding: utf-8
+
+'''
+用于背单词的小程序，在终端中执行类似扇贝单词的测试方式。
+最后可以将单词本中不认识的单词整理到一个resume.txt的文件中去
+首先需要一个单词整理的文件，然后run: python wordsHelper.py txtName
+'''
 
 import sys, os
 
@@ -7,19 +12,15 @@ import sys, os
 def read_file(filename):
     word_dic = {}
     if not os.path.isfile(filename):
-        print 'Sorry this file doesn\'t exist...'
+        print "Sorry this file doesn't exist..."
         return
     file_to_read = open(filename,'r')
     lines = file_to_read.readlines()
     for line in lines:
-        # print line
         words = line.split(' ')
         word = words[0]
-        # print word
         explanation = ' '.join(words[1:])
-        # print explanation
         word_dic[word] = explanation
-        # raw_input()
     file_to_read.close()
     return word_dic
 
@@ -41,9 +42,7 @@ def save_file(words_to_save):
                 
         target = open('resume.txt','a')
         target.write('\n')
-        
-    # print words_exist 
-       
+               
     for word in words_to_save.keys():
         if word in words_exist:
             continue
@@ -57,8 +56,6 @@ def save_file(words_to_save):
        
 # 测试单词
 def test_words(word_dic):
-    # print word_dic
-    # raw_input()
     total = len(word_dic)
     progress = 0
     words_to_save = {}
@@ -99,8 +96,12 @@ def clear():
         os.system('cls')
         
 if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print 'Not enough inputs, the standard input should be: python wordsHelper.py txtName'
+        exit()
     word_dic = read_file(sys.argv[1])
     words_to_save = test_words(word_dic)
     save_file(words_to_save)
     clear()
     print 'All done!'
+    

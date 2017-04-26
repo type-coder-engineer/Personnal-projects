@@ -1,5 +1,10 @@
 # -*- coding: UTF-8 -*-
 
+'''
+一个在终端中把图片用字符串表现出来的脚本， 直接run: python picture2ascii pictureName即可
+原理很简单，就是一个灰度到不同密度字符的映射
+'''
+
 from PIL import Image
 import argparse
 

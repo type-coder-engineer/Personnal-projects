@@ -1,7 +1,13 @@
-# -*- coding: utf-8 -*-  # to be able to comment in Chinese
+# -*- coding: utf-8 -*- 
 
 # the order of the dict: year, author, ISBN, title
 # I used the Python 2.7 to do the coding
+
+'''
+帮大锤做的一份作业，当时觉得做的还不错，现在看看简直血崩。。。
+当时还为了去掉读取string后多出来的引号绞尽脑汁想了一个好奇怪的方法，
+现在知道可以直接eval()了
+'''
 
 import os
 #for the test

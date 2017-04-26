@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 '''
-a script to compare the pictures in two different dossiers and find the pictures only in one dossier and put them in another dossier resulat
+用于找到两个不同文件夹中包含的不同图片，并保存在result文件夹中
+run python compare.py dirName1 dirName2 即可
+a script to compare the pictures in two different dossiers and find the pictures only in 
+one dossier and put them in another dossier resulat
 '''
 import os, sys
 from PIL import Image
@@ -45,7 +48,7 @@ def compare(error):
             if (flagFind == 1):
                 break
                 
-        if (flagFind == 0):
+        if not flagFind:
             listDiff.append(one1)
             
         number += 1 
@@ -64,12 +67,15 @@ if __name__ == "__main__":
         exit()
         
     path = os.getcwd()
-    path1 = path + separator + 'group1'
-    path2 = path + separator + 'group2'
+    if len(sys.argv < 3):
+        print 'Not enough inputs...'
+        exit()
+    path1 = path + separator + sys.argv[1]
+    path2 = path + separator + sys.argv[2]
     listDiff = list()
     error = 600
     compare(error)
-    while len(listDiff) > 5:
+    while len(listDiff) > 5: # 两个文件夹中不同的图片有5张
         print 'Found extra pictures, changing the error and redo the calcul...'
         del listDiff[:] # 这个是清空list的方法，没有list.clear()这个方法。。。
         error += 200

@@ -1,8 +1,10 @@
 #!/usr/bin/python
 #-*- coding:UTF-8 -*-
-# 一个用来给批量图片命名同时将尺寸调节一致的脚本
-
-import os
+'''
+一个用来给批量图片命名同时将尺寸调节一致的脚本
+run: python rename.py dirName
+'''
+import os, sys
 from PIL import Image
 import shutil
 
@@ -48,7 +50,9 @@ def resizeImage(mypath):
 
 if __name__ == "__main__":
     path = os.getcwd()
-    myPath = path + "\\pokemon"
+    if len(sys.argv) < 2:
+        print 'Not enough inputs, standard input should be: python rename.py dirName'
+    myPath = os.path.join(path, sys.argv[1])
     os.chdir(myPath)   
     optionalForme = ('.png', '.jpg')
     

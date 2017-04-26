@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+
+'''
+用于抓取一张图片上的某一部分，输入的zone是左上角的坐标和右下角的坐标，注意是先宽后高
+run: python resourceCapture.py pictureName
+'''
+
 import os, sys
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -23,7 +29,7 @@ def capture(filename):
                 continue
             
         if len(region) != 4:
-            print 'wrong input'
+            print 'Wrong input...You should give 4 ints as the positions of two points'
             continue
                 
         myregion = list()

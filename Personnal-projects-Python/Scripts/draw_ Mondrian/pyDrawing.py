@@ -1,6 +1,8 @@
 # -*-coding: utf-8 -*-
-# 使用迭代进行作画
-
+'''
+使用迭代和黄金分割来画蒙德里安的画
+Using recursion and the Golden ratio to draw Mondrian type picture
+'''
 from PIL import Image
 import numpy as nu
 from progressbar import *
