@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Sep 11 16:36:03 2013
-
+the class for all the objects in the game
 @author: ZHANG Chenyu
 """
 
@@ -311,6 +310,7 @@ class Boss_level3(Boss_level1):
         Boss_level1.__init__(self, boss_img, boss_down_img, init_pos)
         self.bullet_max = 6
         self.bullet = self.bullet_max
+        self.shoot_frequency = 25
         self.recharge_time = 50
         self.recharging = self.recharge_time
         self.bomb_damage = 5
@@ -367,8 +367,9 @@ class Boss_level3(Boss_level1):
 class Boss_level4(Boss_level3):
     def __init__(self, boss_img, boss_down_img, init_pos):
         Boss_level3.__init__(self, boss_img, boss_down_img, init_pos)
-        self.bullet_max = 6
+        self.bullet_max = 7
         self.bullet = self.bullet_max
+        self.shoot_frequency = 25
         self.recharge_time = 40
         self.recharging = self.recharge_time
         self.bomb_damage = 3
@@ -489,9 +490,10 @@ class Boss_level5(Enemy1):
     def __init__(self, enemy_img, enemy_down_imgs, init_pos):
         Enemy1.__init__(self, enemy_img, enemy_down_imgs, init_pos)
         self.life = 30
-        self.bullet_max = 6
+        self.bullet_max = 8
         self.bullet = self.bullet_max
-        self.shoot_frequency = 20
+        self.shoot_frequency = 30
+        self.shoot_frequency_time = 30
         self.enemy_bullets = pygame.sprite.Group()
         self.recharge_time = 50
         self.recharging = self.recharge_time

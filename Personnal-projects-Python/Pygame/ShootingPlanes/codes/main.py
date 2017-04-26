@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+My first game, wrote by pygame 
 @author: ZHANG Chenyu
 """
 
@@ -9,9 +10,10 @@ from pygame.locals import *
 from gameRole import *
 import random
 import os
+
 # 注意存放文件的文件夹命名不要有中文，不然会找不到同一个文件夹下的文件，比如gameRole
 
-    # initialize the game
+# initialize the game
 pygame.init()
 if os.name == 'posix':
     flags = FULLSCREEN | DOUBLEBUF
@@ -46,14 +48,19 @@ beat_boss_sound.set_volume(0.3)
 bgm = pygame.mixer.Sound('resources/sound/game_music.wav')
 bgm.play(-1, 0)
 bgm.set_volume(0.1)
+
 #设置游戏资源
 background = pygame.image.load('resources/image/back_ground.png').convert()
 gameover = pygame.image.load('resources/image/game_over.png')
 gameicon = pygame.image.load('resources/image/myPlane32.png')
 resources = pygame.image.load('resources/image/shoot.png')
+# timeout_icon = pygame.image.load('resources/image/timeout.png')
 
 pygame.display.set_icon(gameicon) #可以在标题栏上出现一个小飞机，注意icon最好是32x32 的png
 
+# 暂停按钮
+# timeout_rect = pygame.Rect(1, 1, 58, 58)
+# timeout_img = timeout_icon.subsurface(timeout_rect)
 #奖励
 #无限子弹 (268, 398, 57, 87) 有效触碰(279, 455, 43, 30)
 #炮弹 (103, 120, 60, 105) 有效触碰(103, 186, 53, 37)
@@ -140,6 +147,8 @@ def classicMode():
     running = 1
     flag_betweenLevel = 0
     index_betweenLevel = 0
+    timeout_frequency = 20
+    flag_timeout = False
     
     player = Player(player_img, player_down_img, player_pos)
     clock = pygame.time.Clock()
@@ -147,6 +156,8 @@ def classicMode():
     score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
     bullet_font = pygame.font.Font('freesansbold.ttf', 20)
     bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+    timeout_font = pygame.font.Font('freesansbold.ttf', 50)
+    timeout_text = timeout_font.render('Time Out...', True, (0, 100, 200))
     
     while running:
         # 控制游戏最大帧率为60
@@ -281,6 +292,7 @@ def classicMode():
         screen.blit(score_text, text_rect)
                 
         # 绘制子弹数目和bomb数目
+        # 绘制timeout按钮
         # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
             bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
@@ -300,7 +312,7 @@ def classicMode():
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
         screen.blit(bomb_text, bombText_rect)
-        
+        # screen.blit(timeout_img, (SCREEN_WIDTH - 100, 60))
         # 监听键盘事件
         key_pressed = pygame.key.get_pressed()
         # 若玩家被击中，则无效
@@ -329,7 +341,33 @@ def classicMode():
                 player.moveLeft()
             if key_pressed[K_d] or key_pressed[K_RIGHT]:
                 player.moveRight()
-            
+                
+            if timeout_frequency < 20:
+                timeout_frequency += 1
+            if key_pressed[K_t] and timeout_frequency == 20:
+                flag_timeout = True
+                timeout_frequency = 0
+                while(1): 
+                    clock.tick(60)
+                    timeout_rect = timeout_text.get_rect()
+                    timeout_rect.centerx = screen.get_rect().centerx
+                    timeout_rect.centery = screen.get_rect().centery
+                    screen.blit(timeout_text, timeout_rect)
+                    pygame.display.update()
+                    if timeout_frequency < 20:
+                        timeout_frequency += 1
+                    if not flag_timeout:
+                        timeout_frequency = 0
+                        break
+                    key_pressed = pygame.key.get_pressed()
+                    if key_pressed[K_t] and timeout_frequency == 20:
+                        flag_timeout = False
+                        timeout_frequency = 0
+                    for timeout_event in pygame.event.get():
+                        if timeout_event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()   
+        
         if player.shoot_frequency < 15:  # 现在飞机射子弹的频率下来了
             player.shoot_frequency += 1
         if player.bomb_frequency < 15:
@@ -363,6 +401,7 @@ def level1(clock, player, flag_saw_boss, again):
         player.rect.topleft = player_pos
         player.is_hit = False
         player.score = 0
+        player.NL_bullet_time = 0
         
     enemies1 = pygame.sprite.Group()  # enemy1的group
     awards = pygame.sprite.Group()  # 奖励的group
@@ -372,7 +411,7 @@ def level1(clock, player, flag_saw_boss, again):
     award_time = 100  # 第一个award出现
     boss_flag = flag_saw_boss
     if boss_flag == 1:
-        myTime = 4300
+        myTime = 3300
     else:
         myTime = 0
     boss_down_flag = 0
@@ -396,6 +435,10 @@ def level1(clock, player, flag_saw_boss, again):
     boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
     bullet_font = pygame.font.Font('freesansbold.ttf', 20)
     bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+    timeout_frequency = 20
+    flag_timeout = False
+    timeout_font = pygame.font.Font('freesansbold.ttf', 50)
+    timeout_text = timeout_font.render('Time Out...', True, (0, 100, 200))
     
     while boss_flag == 0:
         clock.tick(60)
@@ -442,16 +485,17 @@ def level1(clock, player, flag_saw_boss, again):
             if index_betweenLevel == 400:
                 if pass_level < 2:
                     pass_level = 2
+                    save_game()
                 return 1
             
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % (90 - int(myTime / 80)) == 0 and myTime <= 4000:  # 通过这个数字来确定出现的频率
+            if myTime % (100 - int(myTime / 80)) == 0 and myTime <= 3000:  # 通过这个数字来确定出现的频率
                 enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
                 enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
          #生成boss
-        if myTime == 4300:
+        if myTime == 3300:
             boss = Boss_level1(boss_img, boss_down_img, boss_pos)
             boss_once_flag = 1
             boss_flag = 1
@@ -485,10 +529,12 @@ def level1(clock, player, flag_saw_boss, again):
                 
             #boss和玩家相撞   
             if pygame.sprite.collide_rect(boss, player):
-                player.is_hit = True
-                game_over_sound.play()
-                boss.life -= boss.bomb_damage
-                
+                if player.is_hit is not True:
+                    player.is_hit = True
+                    game_over_sound.play()
+                    boss.life -= boss.bomb_damage
+                else:
+                    pass
             #发现没有合适的函数，要去看文档！！
             if pygame.sprite.spritecollideany(boss, player.bullets):
                 if boss.flag_showup == 1:
@@ -546,7 +592,7 @@ def level1(clock, player, flag_saw_boss, again):
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         boss.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -680,7 +726,7 @@ def level1(clock, player, flag_saw_boss, again):
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
         screen.blit(bomb_text, bombText_rect)
-        
+        # screen.blit(timeout_img, (SCREEN_WIDTH - 100, 60))
         # 监听键盘事件
         key_pressed = pygame.key.get_pressed()
         # 若玩家被击中，则无效
@@ -713,7 +759,34 @@ def level1(clock, player, flag_saw_boss, again):
                 player.moveLeft()
             if key_pressed[K_d] or key_pressed[K_RIGHT]:
                 player.moveRight()
-            
+                
+         # 按t来暂停
+            if timeout_frequency < 20:
+                timeout_frequency += 1
+            if key_pressed[K_t] and timeout_frequency == 20:
+                flag_timeout = True
+                timeout_frequency = 0
+                while(1): 
+                    clock.tick(60)
+                    timeout_rect = timeout_text.get_rect()
+                    timeout_rect.centerx = screen.get_rect().centerx
+                    timeout_rect.centery = screen.get_rect().centery
+                    screen.blit(timeout_text, timeout_rect)
+                    pygame.display.update()
+                    if timeout_frequency < 20:
+                        timeout_frequency += 1
+                    if not flag_timeout:
+                        timeout_frequency = 0
+                        break
+                    key_pressed = pygame.key.get_pressed()
+                    if key_pressed[K_t] and timeout_frequency == 20:
+                        flag_timeout = False
+                        timeout_frequency = 0
+                    for timeout_event in pygame.event.get():
+                        if timeout_event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()   
+                            
         if player.shoot_frequency < 15:  # 现在飞机射子弹的频率下来了
             player.shoot_frequency += 1
         if player.bomb_frequency < 15:
@@ -732,7 +805,7 @@ def level1(clock, player, flag_saw_boss, again):
         # 更新屏幕
         pygame.display.update()
         myTime += 1
-        
+            
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -747,6 +820,7 @@ def level2(clock, player, flag_saw_boss, again):
         player.rect.topleft = player_pos
         player.is_hit = False
         player.score = 0
+        player.NL_bullet_time = 0
         
     enemies1 = pygame.sprite.Group()  # enemy1的group
     awards = pygame.sprite.Group()  # 奖励的group
@@ -756,7 +830,7 @@ def level2(clock, player, flag_saw_boss, again):
     award_time = 100  # 第一个award出现
     boss_flag = flag_saw_boss
     if boss_flag == 1:
-        myTime = 5900
+        myTime = 3300
     else:
         myTime = 0
     boss1_down_flag = 0
@@ -779,6 +853,10 @@ def level2(clock, player, flag_saw_boss, again):
     boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
     bullet_font = pygame.font.Font('freesansbold.ttf', 20)
     bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+    timeout_frequency = 20
+    flag_timeout = False
+    timeout_font = pygame.font.Font('freesansbold.ttf', 50)
+    timeout_text = timeout_font.render('Time Out...', True, (0, 100, 200))
     
     while running:
         # 控制游戏最大帧率为60
@@ -805,16 +883,17 @@ def level2(clock, player, flag_saw_boss, again):
             if index_betweenLevel == 400:
                 if pass_level < 3:
                     pass_level = 3
+                    save_game()
                 return 1
                 
         if boss_flag == 0 and boss1_down_flag == 0 and boss2_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % (90 - int(myTime / 70)) == 0 and myTime <= 5600:  # 通过这个数字来确定出现的频率
+            if myTime % (80 - int(myTime / 60)) == 0 and myTime <= 3000:  # 通过这个数字来确定出现的频率
                 enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
                 enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
          #生成boss
-        if myTime == 5900:
+        if myTime == 3300:
             boss1 = Boss_level1(boss_img, boss_down_img, boss_pos_left)
             boss2 = Boss_level2(boss_img, boss_down_img, boss_pos_right)
             boss_once_flag = 1
@@ -875,14 +954,19 @@ def level2(clock, player, flag_saw_boss, again):
                 
             #boss和玩家相撞   
             if pygame.sprite.collide_rect(boss1, player):
-                player.is_hit = True
-                game_over_sound.play()
-                boss1.life -= boss1.bomb_damage
+                if player.is_hit is not True:
+                    player.is_hit = True
+                    game_over_sound.play()
+                    boss1.life -= boss1.bomb_damage
+                else:
+                    pass
             if pygame.sprite.collide_rect(boss2, player):
-                player.is_hit = True
-                game_over_sound.play()
-                boss2.life -= boss2.bomb_damage         
-                
+                if player.is_hit is not True:
+                    player.is_hit = True
+                    game_over_sound.play()
+                    boss2.life -= boss2.bomb_damage         
+                else:
+                    pass
             #发现没有合适的函数，要去看文档！！
             if pygame.sprite.spritecollideany(boss1, player.bullets):
                 if boss1.flag_showup == 1:
@@ -956,7 +1040,7 @@ def level2(clock, player, flag_saw_boss, again):
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss1.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         boss1.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -973,7 +1057,7 @@ def level2(clock, player, flag_saw_boss, again):
             boss1.enemy_bullets.draw(screen)   
             if pygame.sprite.spritecollideany(player, boss2.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         boss2.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -1128,7 +1212,7 @@ def level2(clock, player, flag_saw_boss, again):
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
         screen.blit(bomb_text, bombText_rect)
-        
+        # screen.blit(timeout_img, (SCREEN_WIDTH - 100, 60))
         # 监听键盘事件
         key_pressed = pygame.key.get_pressed()
         # 若玩家被击中，则无效
@@ -1164,6 +1248,33 @@ def level2(clock, player, flag_saw_boss, again):
                 player.moveLeft()
             if key_pressed[K_d] or key_pressed[K_RIGHT]:
                 player.moveRight()
+                
+         # 按t来暂停
+            if timeout_frequency < 20:
+                timeout_frequency += 1
+            if key_pressed[K_t] and timeout_frequency == 20:
+                flag_timeout = True
+                timeout_frequency = 0
+                while(1): 
+                    clock.tick(60)
+                    timeout_rect = timeout_text.get_rect()
+                    timeout_rect.centerx = screen.get_rect().centerx
+                    timeout_rect.centery = screen.get_rect().centery
+                    screen.blit(timeout_text, timeout_rect)
+                    pygame.display.update()
+                    if timeout_frequency < 20:
+                        timeout_frequency += 1
+                    if not flag_timeout:
+                        timeout_frequency = 0
+                        break
+                    key_pressed = pygame.key.get_pressed()
+                    if key_pressed[K_t] and timeout_frequency == 20:
+                        flag_timeout = False
+                        timeout_frequency = 0
+                    for timeout_event in pygame.event.get():
+                        if timeout_event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()   
             
         if player.shoot_frequency < 15:  # 现在飞机射子弹的频率下来了
             player.shoot_frequency += 1
@@ -1183,7 +1294,7 @@ def level2(clock, player, flag_saw_boss, again):
         # 更新屏幕
         pygame.display.update()
         myTime += 1
-        
+            
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -1198,6 +1309,7 @@ def level3(clock, player, flag_saw_boss, again):
         player.rect.topleft = player_pos
         player.is_hit = False
         player.score = 0
+        player.NL_bullet_time = 0
         
     enemies1 = pygame.sprite.Group()  # enemy1的group
     enemies2 = pygame.sprite.Group()  # enemy2的group
@@ -1209,7 +1321,7 @@ def level3(clock, player, flag_saw_boss, again):
     award_time = 100  # 第一个award出现
     boss_flag = flag_saw_boss
     if boss_flag == 1:
-        myTime = 6700
+        myTime = 3400
     else:
         myTime = 0
     boss_down_flag = 0
@@ -1232,6 +1344,10 @@ def level3(clock, player, flag_saw_boss, again):
     boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
     bullet_font = pygame.font.Font('freesansbold.ttf', 20)
     bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+    timeout_frequency = 20
+    flag_timeout = False
+    timeout_font = pygame.font.Font('freesansbold.ttf', 50)
+    timeout_text = timeout_font.render('Time Out...', True, (0, 100, 200))
     
     while running:
         # 控制游戏最大帧率为60
@@ -1258,17 +1374,18 @@ def level3(clock, player, flag_saw_boss, again):
             if index_betweenLevel == 400:
                 if pass_level < 4:
                     pass_level = 4
+                    save_game()
                 return 1
                 
         # 生成两种敌人
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % (100 - int(myTime / 80)) == 0 and myTime <= 6400:  # 通过这个数字来确定出现的频率
+            if myTime % (100 - int(myTime / 70)) == 0 and myTime <= 3200:  # 通过这个数字来确定出现的频率
                 enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
                 enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % 400 == 0 and myTime > 0:  # 通过这个数字来确定出现的频率, 不要一上来就有
+            if myTime % 500 == 0 and myTime > 0:  # 通过这个数字来确定出现的频率, 不要一上来就有
                 enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
                 enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
                 enemies2.add(enemy2)
@@ -1276,7 +1393,7 @@ def level3(clock, player, flag_saw_boss, again):
                     enemy2_once_flag = 1
                 
          #生成boss
-        if myTime == 6700:
+        if myTime == 3400:
             boss = Boss_level3(boss_img, boss_down_img, boss_pos)
             boss_once_flag = 1
             boss_flag = 1
@@ -1361,10 +1478,12 @@ def level3(clock, player, flag_saw_boss, again):
                     
             #boss和玩家相撞   
             if pygame.sprite.collide_rect(boss, player):
-                player.is_hit = True
-                game_over_sound.play()
-                boss.life -= boss.bomb_damage
-                
+                if player.is_hit is not True:
+                    player.is_hit = True
+                    game_over_sound.play()
+                    boss.life -= boss.bomb_damage
+                else:
+                    pass
             #发现没有合适的函数，要去看文档！！
             if pygame.sprite.spritecollideany(boss, player.bullets):
                 if boss.flag_showup == 1:
@@ -1381,7 +1500,7 @@ def level3(clock, player, flag_saw_boss, again):
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         boss.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -1489,7 +1608,7 @@ def level3(clock, player, flag_saw_boss, again):
         if enemy2_once_flag == 1:
             if pygame.sprite.spritecollideany(player, enemy2.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         enemy2.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -1633,7 +1752,7 @@ def level3(clock, player, flag_saw_boss, again):
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
         screen.blit(bomb_text, bombText_rect)
-        
+        # screen.blit(timeout_img, (SCREEN_WIDTH - 100, 60))
         # 监听键盘事件
         key_pressed = pygame.key.get_pressed()
         # 若玩家被击中，则无效
@@ -1672,6 +1791,33 @@ def level3(clock, player, flag_saw_boss, again):
                 player.moveLeft()
             if key_pressed[K_d] or key_pressed[K_RIGHT]:
                 player.moveRight()
+                
+         # 按t来暂停
+            if timeout_frequency < 20:
+                timeout_frequency += 1
+            if key_pressed[K_t] and timeout_frequency == 20:
+                flag_timeout = True
+                timeout_frequency = 0
+                while(1): 
+                    clock.tick(60)
+                    timeout_rect = timeout_text.get_rect()
+                    timeout_rect.centerx = screen.get_rect().centerx
+                    timeout_rect.centery = screen.get_rect().centery
+                    screen.blit(timeout_text, timeout_rect)
+                    pygame.display.update()
+                    if timeout_frequency < 20:
+                        timeout_frequency += 1
+                    if not flag_timeout:
+                        timeout_frequency = 0
+                        break
+                    key_pressed = pygame.key.get_pressed()
+                    if key_pressed[K_t] and timeout_frequency == 20:
+                        flag_timeout = False
+                        timeout_frequency = 0
+                    for timeout_event in pygame.event.get():
+                        if timeout_event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()   
             
         if player.shoot_frequency < 15:  # 现在飞机射子弹的频率下来了
             player.shoot_frequency += 1
@@ -1691,7 +1837,7 @@ def level3(clock, player, flag_saw_boss, again):
         # 更新屏幕
         pygame.display.update()
         myTime += 1
-        
+            
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -1706,6 +1852,7 @@ def level4(clock, player, flag_saw_boss, again):
         player.rect.topleft = player_pos
         player.is_hit = False
         player.score = 0
+        player.NL_bullet_time = 0
         
     enemies1 = pygame.sprite.Group()  # enemy1的group
     enemies2 = pygame.sprite.Group()  # enemy2的group
@@ -1717,7 +1864,7 @@ def level4(clock, player, flag_saw_boss, again):
     award_time = 100  # 第一个award出现
     boss_flag = flag_saw_boss
     if boss_flag == 1:
-        myTime = 7500
+        myTime = 3900
     else:
         myTime = 0
     boss_down_flag = 0
@@ -1743,6 +1890,10 @@ def level4(clock, player, flag_saw_boss, again):
     boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
     bullet_font = pygame.font.Font('freesansbold.ttf', 20)
     bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+    timeout_frequency = 20
+    flag_timeout = False
+    timeout_font = pygame.font.Font('freesansbold.ttf', 50)
+    timeout_text = timeout_font.render('Time Out...', True, (0, 100, 200))
     
     while running:
         # 控制游戏最大帧率为60
@@ -1769,17 +1920,18 @@ def level4(clock, player, flag_saw_boss, again):
             if index_betweenLevel == 400:
                 if pass_level < 5:
                     pass_level = 5
+                    save_game()
                 return 1
                 
         # 生成两种敌人
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % (80 - int(myTime / 120)) == 0 and myTime <= 7200:  # 通过这个数字来确定出现的频率
+            if myTime % (70 - int(myTime / 120)) == 0 and myTime <= 3600:  # 通过这个数字来确定出现的频率
                 enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
                 enemy1 = Enemy1_level4(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % 300 == 0 and myTime > 0:  # 通过这个数字来确定出现的频率
+            if myTime % 500 == 0 and myTime > 0:  # 通过这个数字来确定出现的频率
                 enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
                 enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
                 enemies2.add(enemy2)
@@ -1787,7 +1939,7 @@ def level4(clock, player, flag_saw_boss, again):
                     enemy2_once_flag = 1
                 
          #生成boss
-        if myTime == 7500:
+        if myTime == 3900:
             boss = Boss_level4(boss_img, boss_down_img, boss_pos)
             boss_once_flag = 1
             boss_flag = 1
@@ -1915,10 +2067,12 @@ def level4(clock, player, flag_saw_boss, again):
                     
             #boss和玩家相撞   
             if pygame.sprite.collide_rect(boss, player):
-                player.is_hit = True
-                game_over_sound.play()
-                boss.life -= boss.bomb_damage
-                
+                if player.is_hit is not True:
+                    player.is_hit = True
+                    game_over_sound.play()
+                    boss.life -= boss.bomb_damage
+                else:
+                    pass
             #发现没有合适的函数，要去看文档！！
             if pygame.sprite.spritecollideany(boss, player.bullets):
                 if boss.flag_showup == 1:
@@ -1935,7 +2089,7 @@ def level4(clock, player, flag_saw_boss, again):
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         boss.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -2047,7 +2201,7 @@ def level4(clock, player, flag_saw_boss, again):
         if enemy2_once_flag == 1:
             if pygame.sprite.spritecollideany(player, enemy2.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         enemy2.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -2085,16 +2239,18 @@ def level4(clock, player, flag_saw_boss, again):
             enemy2_down.down_index += 1    
             
         if boss_down_flag == 1:
-            img_index = boss.down_index // 20
+            img_index = boss.down_index // 25
             screen.blit(boss_down_img[img_index], boss.rect)
             boss.down_index += 1
             target = (player.rect.left + player.rect.right) / 2 - (boss.rect.left + boss.rect.right) / 2
             boss.suicide_move(target)
             if pygame.sprite.collide_rect(boss, player):
-                player.is_hit = True
-                game_over_sound.play()
-            if boss.down_index == 119:
+                if player.is_hit is not True:
+                    player.is_hit = True
+                    game_over_sound.play()
+            if boss.down_index == 149:
                 boss_down_flag = 0
+                boss_flag = 0
                 flag_betweenLevel = 1
                 myGame = 1
                 myScore = player.score
@@ -2151,7 +2307,7 @@ def level4(clock, player, flag_saw_boss, again):
             if player.down_index > 31:
                 myGame = 0
                 myScore = player.score
-                return boss_flag
+                return (boss_flag or boss_down_flag)
                 
  # 绘制子弹和和奖励和敌机
         player.bullets.draw(screen)
@@ -2195,7 +2351,7 @@ def level4(clock, player, flag_saw_boss, again):
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
         screen.blit(bomb_text, bombText_rect)
-        
+        # screen.blit(timeout_img, (SCREEN_WIDTH - 100, 60))
         # 监听键盘事件
         key_pressed = pygame.key.get_pressed()
         # 若玩家被击中，则无效
@@ -2234,6 +2390,33 @@ def level4(clock, player, flag_saw_boss, again):
                 player.moveLeft()
             if key_pressed[K_d] or key_pressed[K_RIGHT]:
                 player.moveRight()
+                
+         # 按t来暂停
+            if timeout_frequency < 20:
+                timeout_frequency += 1
+            if key_pressed[K_t] and timeout_frequency == 20:
+                flag_timeout = True
+                timeout_frequency = 0
+                while(1): 
+                    clock.tick(60)
+                    timeout_rect = timeout_text.get_rect()
+                    timeout_rect.centerx = screen.get_rect().centerx
+                    timeout_rect.centery = screen.get_rect().centery
+                    screen.blit(timeout_text, timeout_rect)
+                    pygame.display.update()
+                    if timeout_frequency < 20:
+                        timeout_frequency += 1
+                    if not flag_timeout:
+                        timeout_frequency = 0
+                        break
+                    key_pressed = pygame.key.get_pressed()
+                    if key_pressed[K_t] and timeout_frequency == 20:
+                        flag_timeout = False
+                        timeout_frequency = 0
+                    for timeout_event in pygame.event.get():
+                        if timeout_event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()   
             
         if player.shoot_frequency < 15:  # 现在飞机射子弹的频率下来了
             player.shoot_frequency += 1
@@ -2253,8 +2436,8 @@ def level4(clock, player, flag_saw_boss, again):
         # 更新屏幕
         pygame.display.update()
         myTime += 1
-        
-        for event in pygame.event.get():
+            
+        for event in pygame.event.get(): 
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
@@ -2268,6 +2451,7 @@ def level5(clock, player, flag_saw_boss, again):
         player.rect.topleft = player_pos
         player.is_hit = False
         player.score = 0
+        player.NL_bullet_time = 0
         
     enemies1 = pygame.sprite.Group()  # enemy1的group
     enemies2 = pygame.sprite.Group()  # enemy2的group
@@ -2279,7 +2463,7 @@ def level5(clock, player, flag_saw_boss, again):
     award_time = 100  # 第一个award出现
     boss_flag = flag_saw_boss
     if boss_flag == 1:
-        myTime = 7500
+        myTime = 3900
     else:
         myTime = 0
     boss_down_flag = 0
@@ -2312,12 +2496,29 @@ def level5(clock, player, flag_saw_boss, again):
     plot.append("[Boss: Of course, I just want you to live longer ^_^]")
     plot.append("[Player: Let's cut the bullshit and I will give you some colors to look look!]")
     plot.append("[Boss: That's the spirit, may the better of us win ^_^]")    
+    plot.append("(You can use the space key to read the dialogue or use 'b' to skip it)")
+    plot.append("[Boss: I lost! I didn't see it coming... You are good]")   
+    plot.append("[Player: This fight was legen, wait for it... dary! Legendary!]")
+    plot.append("[Boss: Whatever, either way we are gonna be deleted to free the memory]")
+    plot.append("[Player: What are you talking about??]")
+    plot.append("[Boss: Wake up young boy, we are just the objects in the program]")    
+    plot.append("[Boss: And now after the fight, it's time to vanish. It is just our fates.]")  
+    plot.append("[Player: No!! So this journey I came through means nothing?]")
+    plot.append("[Boss: No, actually that's the point of life. We come alone and leave with nothing.]")
+    plot.append("[Boss: You may have some legacies, but what's important is to enjoy this unique life]")
+    plot.append("[Boss: Time to go, may you find your own joy in the real world ^_^]") 
+    
+    myTime = 0
     x = 0
     dialog_index = 1 # 用来防止一按空格就连按了
     score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
     boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
     bullet_font = pygame.font.Font('freesansbold.ttf', 20)
     bomb_font = pygame.font.Font('freesansbold.ttf', 20)
+    timeout_frequency = 20
+    flag_timeout = False
+    timeout_font = pygame.font.Font('freesansbold.ttf', 50)
+    timeout_text = timeout_font.render('Time Out...', True, (0, 100, 200))
     
     while running:
         # 控制游戏最大帧率为60
@@ -2326,16 +2527,16 @@ def level5(clock, player, flag_saw_boss, again):
         screen.fill(0)
         screen.blit(background, (0, 0))
         
-        if flag_betweenLevel == 1:
+        if flag_betweenLevel == 1 and flag_dialog == 0:
             if index_betweenLevel == 0:
                 beat_boss_sound.play()
             index_betweenLevel += 1
-            if index_betweenLevel == 100:
+            if index_betweenLevel == 30:
                 return 1
                 
-        if flag_dialog == 1:    
+        if flag_dialog == 1 and flag_betweenLevel == 0:    
             if x == 16:
-                flag_dialog = 2
+                flag_dialog = 0
                 player.shoot_frequency = 1 # 为了防止最后一下空格发子弹，不是很重要，就是觉得这样比较完善。 The perfection is the cruel mistress ^^
             if x < 16:
                 plotText = plotFont.render(plot[x], True, (0, 50, 150))   # 灰蓝色的文字
@@ -2344,15 +2545,26 @@ def level5(clock, player, flag_saw_boss, again):
                 plotText_rect.centery = screen.get_rect().centery + 100
                 screen.blit(plotText, plotText_rect)
                 
+        if flag_dialog == 1 and flag_betweenLevel == 1:    
+           if x == 27:
+               flag_dialog = 0
+               player.shoot_frequency = 1 # 为了防止最后一下空格发子弹，不是很重要，就是觉得这样比较完善。 The perfection is the cruel mistress ^^
+           if x < 27:
+               plotText = plotFont.render(plot[x], True, (0, 50, 150))   # 灰蓝色的文字
+               plotText_rect = plotText.get_rect()
+               plotText_rect.centerx = screen.get_rect().centerx
+               plotText_rect.centery = screen.get_rect().centery + 100
+               screen.blit(plotText, plotText_rect)            
+               
         # enmey1有三种随机的行为模式
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % (70 - int(myTime / 120)) == 0 and myTime <= 7200:  # 通过这个数字来确定出现的频率
+            if myTime % (70 - int(myTime / 120)) == 0 and myTime <= 3600:  # 通过这个数字来确定出现的频率
                 enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
                 enemy1 = Enemy1_level5(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
          # enemy2 有enemy1的保护       
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
-            if myTime % 300 == 0 and myTime > 0 and myTime <= 5400:  # 通过这个数字来确定出现的频率
+            if myTime % 500 == 0 and myTime > 0 and myTime <= 3500:  # 通过这个数字来确定出现的频率
                 enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
                 enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
                 enemies2.add(enemy2)
@@ -2372,13 +2584,13 @@ def level5(clock, player, flag_saw_boss, again):
                     enemy2_once_flag = 1
                 
          #生成boss
-        if myTime == 7500:
+        if myTime == 3900:
             boss = Boss_level5(enemy1_img, enemy1_down_img, boss_level5_pos)
             boss_once_flag = 1
             boss_flag = 1
                 
         if boss_flag == 1:
-            if boss.flag_showup == 1 and flag_dialog == 2:
+            if boss.flag_showup == 1 and flag_dialog == 0:
                 target = player.rect.centerx - boss.rect.centerx
                 playerleft = list(player.rect.topleft)
                 playerright = list(player.rect.topright)
@@ -2443,7 +2655,7 @@ def level5(clock, player, flag_saw_boss, again):
                 
                 if boss.bullet > 0: 
                     if boss.mode == 2:
-                        if boss.shoot_frequency >= 20:
+                        if boss.shoot_frequency >= boss.shoot_frequency_time:
                             boss.normal_shoot(bullet_enemy_img)
                             bullet_sound.play()
                             boss.shoot_frequency = 0
@@ -2452,7 +2664,7 @@ def level5(clock, player, flag_saw_boss, again):
                         else:
                             boss.shoot_frequency += 1                        
                     if boss.mode == 1:
-                        if boss.shoot_frequency >= 20:
+                        if boss.shoot_frequency >= boss.shoot_frequency_time:
                             if abs(target) < 150:
                                 boss.normal_shoot(bullet_enemy_img)
                                 bullet_sound.play()
@@ -2489,10 +2701,12 @@ def level5(clock, player, flag_saw_boss, again):
             screen.blit(boss.image, boss.rect)        
             
             if pygame.sprite.collide_rect(boss, player):
-                player.is_hit = True
-                game_over_sound.play()
-                boss.life -= boss.bomb_damage
-                
+                if player.is_hit is not True:
+                    player.is_hit = True
+                    game_over_sound.play()
+                    boss.life -= boss.bomb_damage
+                else:
+                    pass
             #发现没有合适的函数，要去看文档！！
             if pygame.sprite.spritecollideany(boss, player.bullets):
                 if boss.flag_showup == 1:
@@ -2535,10 +2749,13 @@ def level5(clock, player, flag_saw_boss, again):
                 
             # summon 和玩家相撞
             if pygame.sprite.collide_rect(boss_summon, player):
-                player.is_hit = True
-                game_over_sound.play()
-                boss_summon.life -= boss_summon.bomb_damage
-                
+                if player.is_hit is not True:
+                    player.is_hit = True
+                    game_over_sound.play()
+                    boss_summon.life -= boss_summon.bomb_damage
+                else:
+                    pass
+                    
             if pygame.sprite.spritecollideany(boss_summon, player.bullets):
                 if boss_summon.flag_showup == 1:
                     boss_summon.life -= 1
@@ -2553,7 +2770,7 @@ def level5(clock, player, flag_saw_boss, again):
         if boss_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         boss.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -2572,7 +2789,7 @@ def level5(clock, player, flag_saw_boss, again):
         if boss_summon_once_flag == 1:
             if pygame.sprite.spritecollideany(player, boss_summon.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         boss_summon.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -2666,7 +2883,6 @@ def level5(clock, player, flag_saw_boss, again):
                         player.is_hit = True
                         game_over_sound.play() 
                         break
-
                     else:
                         pass
                         
@@ -2685,7 +2901,7 @@ def level5(clock, player, flag_saw_boss, again):
         if enemy2_once_flag == 1:
             if pygame.sprite.spritecollideany(player, enemy2.enemy_bullets) :
                 if (enemy_bullet.rect.centery - player.rect.centery) < -35:
-                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 15:
+                    if abs(enemy_bullet.rect.centerx - player.rect.centerx) < 20:
                         enemy2.enemy_bullets.remove(enemy_bullet)
                         player.is_hit = True
                         game_over_sound.play() 
@@ -2728,6 +2944,7 @@ def level5(clock, player, flag_saw_boss, again):
             if boss.down_index == 19:
                 boss_down_flag = 0
                 flag_betweenLevel = 1
+                flag_dialog = 1
                 myGame = 1
                 myScore = player.score
                 
@@ -2739,7 +2956,7 @@ def level5(clock, player, flag_saw_boss, again):
                 boss_summon_down_flag = 0
 
         # 生成奖励
-        if flag_dialog != 1:
+        if flag_dialog != 1 and flag_dialog != 2:
             if award_frequency == award_time and flag_betweenLevel == 0:
                 type = random.randint(0, 20)
                 if type < 15:
@@ -2835,7 +3052,7 @@ def level5(clock, player, flag_saw_boss, again):
         bombText_rect = bomb_text.get_rect()
         bombText_rect.topleft = [SCREEN_WIDTH - 130, 35]
         screen.blit(bomb_text, bombText_rect)
-        
+        # screen.blit(timeout_img, (SCREEN_WIDTH - 100, 60))
         # 监听键盘事件
         key_pressed = pygame.key.get_pressed()
         # 若玩家被击中，则无效
@@ -2847,9 +3064,11 @@ def level5(clock, player, flag_saw_boss, again):
                         player.shoot(bullet_img)
                         player.shoot_frequency = 0
                         player.bullet -= 1
-                if flag_dialog == 1 and dialog_index % 10 == 0:
-                    x += 1
-                    dialog_index = 0
+                else:
+                    if dialog_index % 10 == 0:
+                        x += 1
+                        dialog_index = 0
+                
                     #使用炸弹
             if key_pressed[K_b]:
                 if flag_dialog != 1:
@@ -2877,7 +3096,10 @@ def level5(clock, player, flag_saw_boss, again):
                             boss_summon.life -= boss_summon.bomb_damage
                             
                 else:
-                    x = 16
+                    if flag_betweenLevel == 0:
+                        x = 16
+                    else:
+                        x = 27
                     
             if key_pressed[K_w] or key_pressed[K_UP]:
                 player.moveUp()
@@ -2887,6 +3109,33 @@ def level5(clock, player, flag_saw_boss, again):
                 player.moveLeft()
             if key_pressed[K_d] or key_pressed[K_RIGHT]:
                 player.moveRight()
+                
+         # 按t来暂停
+            if timeout_frequency < 20:
+                timeout_frequency += 1
+            if key_pressed[K_t] and timeout_frequency == 20:
+                flag_timeout = True
+                timeout_frequency = 0
+                while(1): 
+                    clock.tick(60)
+                    timeout_rect = timeout_text.get_rect()
+                    timeout_rect.centerx = screen.get_rect().centerx
+                    timeout_rect.centery = screen.get_rect().centery
+                    screen.blit(timeout_text, timeout_rect)
+                    pygame.display.update()
+                    if timeout_frequency < 20:
+                        timeout_frequency += 1
+                    if not flag_timeout:
+                        timeout_frequency = 0
+                        break
+                    key_pressed = pygame.key.get_pressed()
+                    if key_pressed[K_t] and timeout_frequency == 20:
+                        flag_timeout = False
+                        timeout_frequency = 0
+                    for timeout_event in pygame.event.get():
+                        if timeout_event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()   
             
         if player.shoot_frequency < 15:  # 现在飞机射子弹的频率下来了
             player.shoot_frequency += 1
@@ -2910,6 +3159,8 @@ def level5(clock, player, flag_saw_boss, again):
         pygame.display.update()
         myTime += 1
         
+        if timeout_frequency < 20:
+            timeout_frequency += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -3235,7 +3486,7 @@ def rules():
     myY = [error, error, -error, -error]
     myIndex = 0
     myCenterx = screen.get_rect().centerx
-    myCentery = screen.get_rect().centery + 200  # back按钮原来的位置
+    myCentery = screen.get_rect().centery + 250  # back按钮原来的位置
     flag = 0
     
     while running:
@@ -3257,7 +3508,8 @@ def rules():
         introText7 = introFont.render('And remember every boss has its own pattern, well that\'s for me to know and for you to find out~ LOL ', True, (0, 0, 0))
         introText8 = introFont.render('If you achieve a higher level after the level1, you will be able to reload the game to this level if you are dead.', True, (0, 0, 0)) 
         introText9 = introFont.render('And in the challenging mode, you can enjoy the classic mode of shooting planes game without the boss.', True, (0, 0, 0)) 
-        introText10 = introFont.render('Nothing else to say, I hope you have fun playing this game and I wish you good luck!', True, (0, 0, 0))
+        introText10 = introFont.render('You can use key \'t\' to pause the game and take a break, and use \'t\' again to get back', True, (0, 0, 0))
+        introText11 = introFont.render('Nothing else to say, I hope you have fun playing this game and I wish you good luck!', True, (0, 0, 0))
         
         introText1_rect = introText1.get_rect()
         introText2_rect = introText2.get_rect()
@@ -3269,13 +3521,14 @@ def rules():
         introText8_rect = introText8.get_rect()
         introText9_rect = introText9.get_rect()
         introText10_rect = introText10.get_rect()
+        introText11_rect = introText10.get_rect()
         titleText_rect = titleText.get_rect()
         backText_rect = backText.get_rect()
         
         titleText_rect.centerx =  screen.get_rect().centerx
         titleText_rect.centery = screen.get_rect().centery - 300
         backText_rect.centerx =  screen.get_rect().centerx
-        backText_rect.centery = screen.get_rect().centery + 200
+        backText_rect.centery = screen.get_rect().centery + 250
         
         introText1_rect.centerx = screen.get_rect().centerx
         introText1_rect.centery = screen.get_rect().centery - 240
@@ -3296,7 +3549,9 @@ def rules():
         introText9_rect.centerx = screen.get_rect().centerx
         introText9_rect.centery = screen.get_rect().centery + 80  
         introText10_rect.centerx = screen.get_rect().centerx
-        introText10_rect.centery = screen.get_rect().centery + 120             
+        introText10_rect.centery = screen.get_rect().centery + 120           
+        introText11_rect.centerx = screen.get_rect().centerx
+        introText11_rect.centery = screen.get_rect().centery + 160             
         screen.blit(titleText, titleText_rect)
         screen.blit(introText1, introText1_rect)
         screen.blit(introText2, introText2_rect)
@@ -3308,12 +3563,13 @@ def rules():
         screen.blit(introText8, introText8_rect)
         screen.blit(introText9, introText9_rect)       
         screen.blit(introText10, introText10_rect) 
+        screen.blit(introText11, introText11_rect) 
         
         if flag == 0:
             screen.blit(backText, backText_rect)
         
         showlist = list(pygame.mouse.get_pos())
-        if showlist[0] > 270 and showlist[0] < 530 and showlist[1] > 530 and showlist[1] < 570:
+        if showlist[0] > 270 and showlist[0] < 530 and showlist[1] > 580 and showlist[1] < 620:
             myIndex += 1
             flag = 1
             if myIndex // 7 >= 1 and myIndex % 7 == 0:
@@ -3334,7 +3590,7 @@ def rules():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 poslist = list(pygame.mouse.get_pos())
                # print pygame.mouse.get_pos()  # 用于测试选择项的两个端点的坐标的
-                if poslist[0] > 270 and poslist[0] < 530 and poslist[1] > 530 and poslist[1] < 570:
+                if poslist[0] > 270 and poslist[0] < 530 and poslist[1] > 580 and poslist[1] < 620:
                     running = 0
         pygame.display.update()    
 
