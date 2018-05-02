@@ -2508,7 +2508,7 @@ def level5(clock, player, flag_saw_boss, again):
     plot.append("[Boss: You may have some legacies, but what's important is to enjoy this unique life]")
     plot.append("[Boss: Time to go, may you find your own joy in the real world ^_^]") 
     
-    myTime = 0
+    # myTime = 0
     x = 0
     dialog_index = 1 # 用来防止一按空格就连按了
     score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
