@@ -60,7 +60,7 @@ class Player(pygame.sprite.Sprite):
         self.bullet_max = 5
         self.bomb_max = 3
         self.bullet = 5
-        self.bomb = 1
+        self.bomb = 1  #CZH
         self.score = 0
         self.recharge_time = 60
         self.shoot_frequency = 15
