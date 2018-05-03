@@ -15,7 +15,7 @@ import os
 
 # initialize the game
 pygame.init()
-if os.name == 'posix':
+if os.name == 'posix':   # mac环境中运行必须要这么设置，不然刷新频率太低
     flags = FULLSCREEN | DOUBLEBUF
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags)
     screen.set_alpha(None)
@@ -26,22 +26,22 @@ pygame.display.set_caption('shootPlanes')
 
 # load the music
 pygame.mixer.init()
-bullet_sound = pygame.mixer.Sound('resources/sound/bullet.wav')
+bullet_sound     = pygame.mixer.Sound('resources/sound/bullet.wav')
 enemy_down_sound = pygame.mixer.Sound('resources/sound/enemy1_down.wav')
-boss_down_sound = pygame.mixer.Sound('resources/sound/enemy22_down.wav')
-boss_show_sound = pygame.mixer.Sound('resources/sound/boss_show.wav')
-get_double_bullet_sound = pygame.mixer.Sound('resources/sound/get_double_bullet.wav')
-get_bomb_sound  = pygame.mixer.Sound('resources/sound/get_bomb.wav')
-bomb_sound = pygame.mixer.Sound('resources/sound/use_bomb.wav')
-game_over_sound = pygame.mixer.Sound('resources/sound/game_over.wav')
-beat_boss_sound = pygame.mixer.Sound('resources/sound/vectory.wav')
+boss_down_sound  = pygame.mixer.Sound('resources/sound/enemy22_down.wav')
+boss_show_sound  = pygame.mixer.Sound('resources/sound/boss_show.wav')
+get_bullet_sound = pygame.mixer.Sound('resources/sound/get_bullet.wav')
+get_bomb_sound   = pygame.mixer.Sound('resources/sound/get_bomb.wav')
+bomb_sound       = pygame.mixer.Sound('resources/sound/use_bomb.wav')
+game_over_sound  = pygame.mixer.Sound('resources/sound/game_over.wav')
+beat_boss_sound  = pygame.mixer.Sound('resources/sound/vectory.wav')
 
 #设置音量
 bullet_sound.set_volume(0.3)
 enemy_down_sound.set_volume(0.3)
 game_over_sound.set_volume(0.3)
 boss_show_sound.set_volume(0.3)
-get_double_bullet_sound.set_volume(0.3)
+get_bullet_sound.set_volume(0.3)
 get_bomb_sound.set_volume(0.3)
 bomb_sound.set_volume(0.3)
 beat_boss_sound.set_volume(0.3)
@@ -78,17 +78,19 @@ bullet_img = resources.subsurface(bullet_rect)
 bullet_enemy_rect = pygame.Rect(68, 77, 10, 22)
 bullet_enemy_img = resources.subsurface(bullet_enemy_rect)
 
-# 玩家飞机的图片
-player_rect = []   # 注意这个rect取的方法，第一二个点事是图片的左上角坐标，然后两个数值是宽和高
-player_rect.append(pygame.Rect(0, 99, 102, 126))        # 玩家精灵图片区域
+# 玩家飞机素材
+player_rect = []   # 注意这个rect取的方法，第一二个点是图片的左上角坐标，然后两个数值是宽和高
+player_rect.append(pygame.Rect(0, 99, 102, 126))       
 player_rect.append(pygame.Rect(165, 360, 102, 126))
-player_rect.append(pygame.Rect(165, 234, 102, 126))     # 玩家爆炸精灵图片区域
+player_rect.append(pygame.Rect(165, 234, 102, 126))     
 player_rect.append(pygame.Rect(330, 624, 102, 126))
 player_rect.append(pygame.Rect(330, 498, 102, 126))
 player_rect.append(pygame.Rect(432, 624, 102, 126))
+# 玩家精灵图片区域
 player_img = []
 player_img.append(resources.subsurface(player_rect[0]))
 player_img.append(resources.subsurface(player_rect[1]))
+# 玩家爆炸精灵图片区域
 player_down_img = []
 player_down_img.append(resources.subsurface(player_rect[2]))
 player_down_img.append(resources.subsurface(player_rect[3]))
@@ -96,44 +98,70 @@ player_down_img.append(resources.subsurface(player_rect[4]))
 player_down_img.append(resources.subsurface(player_rect[5]))
 player_pos = [360, 580]
 
-# boss图片
-boss_rect = pygame.Rect(165, 750, 170, 245)
+# 每关boss相关素材
+boss_rect = []
+boss_rect.append(pygame.Rect(165, 750, 170, 245))
+boss_rect.append(pygame.Rect(505, 750, 170, 250))
+boss_rect.append(pygame.Rect(335, 750, 170, 250))
+boss_rect.append(pygame.Rect(  5, 485, 160, 245))
+boss_rect.append(pygame.Rect(  5, 225, 160, 245))
+boss_rect.append(pygame.Rect(842, 750, 160, 245))
+boss_rect.append(pygame.Rect(168, 485, 160, 250))
+boss_rect.append(pygame.Rect(675, 750, 165, 250))
+boss_rect.append(pygame.Rect(  0, 750, 160, 220))
+# boss正常和设计图片
 boss_img = []
-boss_img.append(resources.subsurface(pygame.Rect(165, 750, 170, 245))) # 如果在这里定义boss_image 那下面就没有问题。。。
-boss_img.append(resources.subsurface(pygame.Rect(505, 750, 170, 250))) # 下面两张是射击图
-boss_img.append(resources.subsurface(pygame.Rect(335, 750, 170, 250)))
-
+boss_img.append(resources.subsurface(boss_rect[0])) # 如果在这里定义boss_image 那下面就没有问题。。。
+boss_img.append(resources.subsurface(boss_rect[1]))
+boss_img.append(resources.subsurface(boss_rect[2]))
+# boss爆炸图片
 boss_down_img = []
-boss_down_img.append(resources.subsurface(pygame.Rect(5, 485, 160, 245)))
-boss_down_img.append(resources.subsurface(pygame.Rect(5, 225, 160, 245)))
-boss_down_img.append(resources.subsurface(pygame.Rect(842, 750, 160, 245)))
-boss_down_img.append(resources.subsurface(pygame.Rect(168, 485, 160, 250)))
-boss_down_img.append(resources.subsurface(pygame.Rect(675, 750, 165, 250)))
-boss_down_img.append(resources.subsurface(pygame.Rect(0, 750, 160, 220)))
+boss_down_img.append(resources.subsurface(boss_rect[3]))
+boss_down_img.append(resources.subsurface(boss_rect[4]))
+boss_down_img.append(resources.subsurface(boss_rect[5]))
+boss_down_img.append(resources.subsurface(boss_rect[6]))
+boss_down_img.append(resources.subsurface(boss_rect[7]))
+boss_down_img.append(resources.subsurface(boss_rect[8]))
 
 boss_pos = [screen.get_rect().centerx - 85, 0]
 boss_pos_left = [screen.get_rect().centerx - 285, 0]
 boss_pos_right = [screen.get_rect().centerx + 115, 0]
 boss_level5_pos = [screen.get_rect().centerx - 15, 0]
-# 定义敌机对象使用的surface相关参数
-enemy1_rect = pygame.Rect(538, 612, 50, 40)
-enemy1_img = resources.subsurface(pygame.Rect(538, 612, 50, 40))
-enemy1_down_img = []
-enemy1_down_img.append(resources.subsurface(pygame.Rect(267, 347, 57, 43)))
-enemy1_down_img.append(resources.subsurface(pygame.Rect(873, 697, 57, 43)))
-enemy1_down_img.append(resources.subsurface(pygame.Rect(267, 296, 57, 43)))
-enemy1_down_img.append(resources.subsurface(pygame.Rect(930, 697, 57, 43)))
 
-#enemy2 
-enemy2_rect = pygame.Rect(0, 2, 69, 90)
+# 定义敌机对象使用的surface相关参数, enemy1 不会发射子弹
+enemy1_rect = []
+enemy1_rect.append(pygame.Rect(538, 612, 50, 40))
+enemy1_rect.append(pygame.Rect(267, 347, 57, 43))
+enemy1_rect.append(pygame.Rect(873, 697, 57, 43))
+enemy1_rect.append(pygame.Rect(267, 296, 57, 43))
+enemy1_rect.append(pygame.Rect(930, 697, 57, 43))
+# 正常图片
+enemy1_img = resources.subsurface(enemy1_rect[0])
+# 爆炸图片
+enemy1_down_img = []
+enemy1_down_img.append(resources.subsurface(enemy1_rect[1]))
+enemy1_down_img.append(resources.subsurface(enemy1_rect[2]))
+enemy1_down_img.append(resources.subsurface(enemy1_rect[3]))
+enemy1_down_img.append(resources.subsurface(enemy1_rect[4]))
+
+# 第二种敌机，可以发射子弹
+enemy2_rect = []
+enemy2_rect.append(pygame.Rect(  0,   2, 69, 90))
+enemy2_rect.append(pygame.Rect(432, 528, 69, 92))
+enemy2_rect.append(pygame.Rect(534, 654, 69, 92))
+enemy2_rect.append(pygame.Rect(603, 654, 69, 92))
+enemy2_rect.append(pygame.Rect(672, 653, 69, 92))
+enemy2_rect.append(pygame.Rect(741, 660, 69, 85))
+# 敌机正常的图片
 enemy2_img = []
-enemy2_img.append(resources.subsurface(pygame.Rect(0, 2, 69, 90)))
-enemy2_img.append(resources.subsurface(pygame.Rect(432, 528, 69, 92)))
+enemy2_img.append(resources.subsurface(enemy2_rect[0]))
+enemy2_img.append(resources.subsurface(enemy2_rect[1]))
+# 爆炸图片
 enemy2_down_img = []
-enemy2_down_img.append(resources.subsurface(pygame.Rect(534, 654, 69, 92)))
-enemy2_down_img.append(resources.subsurface(pygame.Rect(603, 654, 69, 92)))
-enemy2_down_img.append(resources.subsurface(pygame.Rect(672, 653, 69, 92)))
-enemy2_down_img.append(resources.subsurface(pygame.Rect(741, 660, 69, 85)))
+enemy2_down_img.append(resources.subsurface(enemy2_rect[2]))
+enemy2_down_img.append(resources.subsurface(enemy2_rect[3]))
+enemy2_down_img.append(resources.subsurface(enemy2_rect[4]))
+enemy2_down_img.append(resources.subsurface(enemy2_rect[5]))
 
 def classicMode():
     enemies1 = pygame.sprite.Group()  # enemy1的group
@@ -167,7 +195,7 @@ def classicMode():
         screen.blit(background, (0, 0))
         
         if enemy1_frequency == interval:  # 通过这个数字来确定出现的频率
-            enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+            enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect[0].width), 0]
             enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
             enemies1.add(enemy1)    
             enemy1_frequency = 0
@@ -255,7 +283,7 @@ def classicMode():
             if pygame.sprite.collide_rect(player, award):
                 if award.kind == 1:
                     player.NL_bullet_time = 400
-                    get_double_bullet_sound.play()
+                    get_bullet_sound.play()
                 else:
                     if player.bomb < player.bomb_max:
                         player.bomb += 1
@@ -381,7 +409,7 @@ def classicMode():
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            get_bullet_sound.play()  # 效果失效时提醒一下
                 
         # 更新屏幕
         pygame.display.update()
@@ -490,7 +518,7 @@ def level1(clock, player, flag_saw_boss, again):
             
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
             if myTime % (100 - int(myTime / 80)) == 0 and myTime <= 3000:  # 通过这个数字来确定出现的频率
-                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect[0].width), 0]
                 enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
@@ -659,7 +687,7 @@ def level1(clock, player, flag_saw_boss, again):
             if pygame.sprite.collide_rect(player, award):
                 if award.kind == 1:
                     player.NL_bullet_time = 400
-                    get_double_bullet_sound.play()
+                    get_bullet_sound.play()
                 else:
                     if player.bomb < player.bomb_max:
                         player.bomb += 1
@@ -800,7 +828,7 @@ def level1(clock, player, flag_saw_boss, again):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            get_bullet_sound.play()  # 效果失效时提醒一下
             
         # 更新屏幕
         pygame.display.update()
@@ -888,7 +916,7 @@ def level2(clock, player, flag_saw_boss, again):
                 
         if boss_flag == 0 and boss1_down_flag == 0 and boss2_down_flag == 0 and flag_betweenLevel == 0:
             if myTime % (80 - int(myTime / 60)) == 0 and myTime <= 3000:  # 通过这个数字来确定出现的频率
-                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect[0].width), 0]
                 enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
@@ -1136,7 +1164,7 @@ def level2(clock, player, flag_saw_boss, again):
             if pygame.sprite.collide_rect(player, award):
                 if award.kind == 1:
                     player.NL_bullet_time = 400
-                    get_double_bullet_sound.play()
+                    get_bullet_sound.play()
                 else:
                     if player.bomb < player.bomb_max:
                         player.bomb += 1
@@ -1289,7 +1317,7 @@ def level2(clock, player, flag_saw_boss, again):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            get_bullet_sound.play()  # 效果失效时提醒一下
             
         # 更新屏幕
         pygame.display.update()
@@ -1380,13 +1408,13 @@ def level3(clock, player, flag_saw_boss, again):
         # 生成两种敌人
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
             if myTime % (100 - int(myTime / 70)) == 0 and myTime <= 3200:  # 通过这个数字来确定出现的频率
-                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect[0].width), 0]
                 enemy1 = Enemy1(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
             if myTime % 500 == 0 and myTime > 0:  # 通过这个数字来确定出现的频率, 不要一上来就有
-                enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
+                enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect[0].width), 0]
                 enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
                 enemies2.add(enemy2)
                 if enemy2_once_flag == 0:
@@ -1685,7 +1713,7 @@ def level3(clock, player, flag_saw_boss, again):
             if pygame.sprite.collide_rect(player, award):
                 if award.kind == 1:
                     player.NL_bullet_time = 400
-                    get_double_bullet_sound.play()
+                    get_bullet_sound.play()
                 else:
                     if player.bomb < player.bomb_max:
                         player.bomb += 1
@@ -1832,7 +1860,7 @@ def level3(clock, player, flag_saw_boss, again):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            get_bullet_sound.play()  # 效果失效时提醒一下
             
         # 更新屏幕
         pygame.display.update()
@@ -1926,13 +1954,13 @@ def level4(clock, player, flag_saw_boss, again):
         # 生成两种敌人
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
             if myTime % (70 - int(myTime / 120)) == 0 and myTime <= 3600:  # 通过这个数字来确定出现的频率
-                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect[0].width), 0]
                 enemy1 = Enemy1_level4(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
                 
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
             if myTime % 500 == 0 and myTime > 0:  # 通过这个数字来确定出现的频率
-                enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
+                enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect[0].width), 0]
                 enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
                 enemies2.add(enemy2)
                 if enemy2_once_flag == 0:
@@ -1987,7 +2015,7 @@ def level4(clock, player, flag_saw_boss, again):
                 if flag_enemy1_boss == 1:      
                     if enemy1_boss_frequency % 15 == 0:
                         enemy1_boss_frequency = 1
-                        enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+                        enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect[0].width), 0]
                         enemy1_boss = Enemy1_Boss(enemy1_img, enemy1_down_img, enemy1_pos)
                         enemies1.add(enemy1_boss)
                         boss.enemy1_number -= 1
@@ -2285,7 +2313,7 @@ def level4(clock, player, flag_saw_boss, again):
             if pygame.sprite.collide_rect(player, award):
                 if award.kind == 1:
                     player.NL_bullet_time = 400
-                    get_double_bullet_sound.play()
+                    get_bullet_sound.play()
                 else:
                     if player.bomb < player.bomb_max:
                         player.bomb += 1
@@ -2431,7 +2459,7 @@ def level4(clock, player, flag_saw_boss, again):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            get_bullet_sound.play()  # 效果失效时提醒一下
             
         # 更新屏幕
         pygame.display.update()
@@ -2477,10 +2505,11 @@ def level5(clock, player, flag_saw_boss, again):
     boss_summon_once_flag = 0
     global myScore 
     global myGame
-    plotFont = pygame.font.Font('freesansbold.ttf', 20)    
+    plotFont = pygame.font.Font('freesansbold.ttf', 19)    
     flag_dialog = 0
+    flag_firstDialog = 0
     plot = []
-    plot.append("(You can use the space key to read the dialogue or use 'b' to skip it)")
+    plot.append("(You can use the space key to read the conversation or use 'b' to skip it)")
     plot.append("[Player: You seem a little different.]")
     plot.append("[Boss: Well I am the final boss so that makes sense]")
     plot.append("[Player: ...You, really?]")
@@ -2496,7 +2525,7 @@ def level5(clock, player, flag_saw_boss, again):
     plot.append("[Boss: Of course, I just want you to live longer ^_^]")
     plot.append("[Player: Let's cut the bullshit and I will give you some colors to look look!]")
     plot.append("[Boss: That's the spirit, may the better of us win ^_^]")    
-    plot.append("(You can use the space key to read the dialogue or use 'b' to skip it)")
+    plot.append("(You can use the space key to read the conversation or use 'b' to skip it)")
     plot.append("[Boss: I lost! I didn't see it coming... You are good]")   
     plot.append("[Player: This fight was legen, wait for it... dary! Legendary!]")
     plot.append("[Boss: Whatever, either way we are gonna be deleted to free the memory]")
@@ -2509,7 +2538,7 @@ def level5(clock, player, flag_saw_boss, again):
     plot.append("[Boss: Time to go, may you find your own joy in the real world ^_^]") 
     
     # myTime = 0
-    x = 0
+    x = 0 # index of plot
     dialog_index = 1 # 用来防止一按空格就连按了
     score_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
     boss_life_font = pygame.font.Font('freesansbold.ttf', 22)
@@ -2531,25 +2560,28 @@ def level5(clock, player, flag_saw_boss, again):
             if index_betweenLevel == 0:
                 beat_boss_sound.play()
             index_betweenLevel += 1
-            if index_betweenLevel == 30:
+            if index_betweenLevel == 30: 
                 return 1
-                
-        if flag_dialog == 1 and flag_betweenLevel == 0:    
+
+        # print flag_dialog
+        # print x
+        if flag_betweenLevel == 0 and flag_dialog == 1:    
             if x == 16:
                 flag_dialog = 0
+                flag_firstDialog = 1
                 player.shoot_frequency = 1 # 为了防止最后一下空格发子弹，不是很重要，就是觉得这样比较完善。 The perfection is the cruel mistress ^^
-            if x < 16:
+            elif x < 16:
                 plotText = plotFont.render(plot[x], True, (0, 50, 150))   # 灰蓝色的文字
                 plotText_rect = plotText.get_rect()
                 plotText_rect.centerx = screen.get_rect().centerx
                 plotText_rect.centery = screen.get_rect().centery + 100
                 screen.blit(plotText, plotText_rect)
                 
-        if flag_dialog == 1 and flag_betweenLevel == 1:    
+        if flag_betweenLevel == 1 and flag_dialog == 1:    
            if x == 27:
                flag_dialog = 0
                player.shoot_frequency = 1 # 为了防止最后一下空格发子弹，不是很重要，就是觉得这样比较完善。 The perfection is the cruel mistress ^^
-           if x < 27:
+           elif x < 27:
                plotText = plotFont.render(plot[x], True, (0, 50, 150))   # 灰蓝色的文字
                plotText_rect = plotText.get_rect()
                plotText_rect.centerx = screen.get_rect().centerx
@@ -2559,13 +2591,13 @@ def level5(clock, player, flag_saw_boss, again):
         # enmey1有三种随机的行为模式
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
             if myTime % (70 - int(myTime / 120)) == 0 and myTime <= 3600:  # 通过这个数字来确定出现的频率
-                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+                enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect[0].width), 0]
                 enemy1 = Enemy1_level5(enemy1_img, enemy1_down_img, enemy1_pos)
                 enemies1.add(enemy1)    
          # enemy2 有enemy1的保护       
         if boss_flag == 0 and boss_down_flag == 0 and flag_betweenLevel == 0:
             if myTime % 500 == 0 and myTime > 0 and myTime <= 3500:  # 通过这个数字来确定出现的频率
-                enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect.width), 0]
+                enemy2_pos = [random.randint(0, SCREEN_WIDTH - enemy2_rect[0].width), 0]
                 enemy2 = Enemy2(enemy2_img, enemy2_down_img, enemy2_pos)
                 enemies2.add(enemy2)
                 # 致敬安德的游戏
@@ -2590,6 +2622,8 @@ def level5(clock, player, flag_saw_boss, again):
             boss_flag = 1
                 
         if boss_flag == 1:
+            # print boss.flag_showup
+            # print flag_dialog
             if boss.flag_showup == 1 and flag_dialog == 0:
                 target = player.rect.centerx - boss.rect.centerx
                 playerleft = list(player.rect.topleft)
@@ -2613,11 +2647,11 @@ def level5(clock, player, flag_saw_boss, again):
                     boss.ishit_flag = 0
                     boss.teleportation = boss.teleportation_recharge
                     boss.mode = 1
-                    # 攻击模式如果发现player靠的很近就瞬移到玩家面前鱼他 LOL
+                    # 攻击模式如果发现player靠的很近就瞬移到玩家面前干他 LOL
                 if boss.mode == 1 and abs(target) > 200 and boss.teleportation == 0 and positiony < 350:
                     boss.teleportation_attack(positionx)
                     boss.teleportation = boss.teleportation_recharge
-                    # 计策模式，如果玩家靠着边太近就从旁边包抄鱼他 LOL
+                    # 计策模式，如果玩家靠着边太近就从旁边包抄干他 LOL
                 if boss.mode == 1 and abs(target) > 500 and boss.teleportation == 0 and positionx < 150: 
                     boss.teleportation_attack(positionx + 300)
                     boss.teleportation = boss.teleportation_recharge
@@ -2642,7 +2676,7 @@ def level5(clock, player, flag_saw_boss, again):
                 
                 if boss.life < 10 and (boss.enemy1 == 0 or boss.enemy1 == 30 or boss.enemy1 == 60 or boss.enemy1 == 90):
                     for one in range(0, 5):
-                        enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect.width), 0]
+                        enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect[0].width), 0]
                         enemy1 = Enemy1_level5(enemy1_img, enemy1_down_img, enemy1_pos)
                         enemies1.add(enemy1)
                     if boss.enemy1 == 0:
@@ -2693,9 +2727,9 @@ def level5(clock, player, flag_saw_boss, again):
                         boss.recharging -= 1
                         
             else:
-                if flag_dialog != 1:
+                if flag_dialog == 0:
                     boss.show()
-                if boss.rect.top > 1 and flag_dialog == 0:
+                if boss.rect.top > 1 and flag_dialog == 0 and not flag_firstDialog:
                     flag_dialog = 1
                                                            
             screen.blit(boss.image, boss.rect)        
@@ -2943,7 +2977,7 @@ def level5(clock, player, flag_saw_boss, again):
             boss.down_index += 1
             if boss.down_index == 19:
                 boss_down_flag = 0
-                flag_betweenLevel = 1
+                flag_betweenLevel = 1  # 表示boss已经结束了
                 flag_dialog = 1
                 myGame = 1
                 myScore = player.score
@@ -2986,7 +3020,7 @@ def level5(clock, player, flag_saw_boss, again):
             if pygame.sprite.collide_rect(player, award):
                 if award.kind == 1:
                     player.NL_bullet_time = 400
-                    get_double_bullet_sound.play()
+                    get_bullet_sound.play()
                 else:
                     if player.bomb < player.bomb_max:
                         player.bomb += 1
@@ -2996,7 +3030,7 @@ def level5(clock, player, flag_saw_boss, again):
             if award.rect.bottom > 700:
                 awards.remove(award)
                 
-# 绘制玩家飞机
+        # 绘制玩家飞机
         if not player.is_hit:
             screen.blit(player.image[player.index], player.rect)
             # 更换图片索引使飞机有动画效果
@@ -3010,7 +3044,7 @@ def level5(clock, player, flag_saw_boss, again):
                 myScore = player.score
                 return boss_flag
                 
- # 绘制子弹和和奖励和敌机
+        # 绘制子弹和和奖励和敌机
         player.bullets.draw(screen)
         awards.draw(screen)
         enemies1.draw(screen)
@@ -3058,7 +3092,7 @@ def level5(clock, player, flag_saw_boss, again):
         # 若玩家被击中，则无效
         if not player.is_hit:
             if key_pressed[K_SPACE]:
-                if flag_dialog != 1:
+                if flag_dialog == 0:
                     if player.shoot_frequency % 15 == 0 and (player.bullet > 0 or player.NL_bullet_time > 0):
                         bullet_sound.play()
                         player.shoot(bullet_img)
@@ -3100,7 +3134,8 @@ def level5(clock, player, flag_saw_boss, again):
                         x = 16
                     else:
                         x = 27
-                    
+                    player.bomb_frequency = 1
+					
             if key_pressed[K_w] or key_pressed[K_UP]:
                 player.moveUp()
             if key_pressed[K_s] or key_pressed[K_DOWN]:
@@ -3153,7 +3188,7 @@ def level5(clock, player, flag_saw_boss, again):
         player.NL_bullet_time -= 1
         if player.NL_bullet_time == 0:
             player.bullet = player.bullet_max
-            get_double_bullet_sound.play()  # 效果失效时提醒一下
+            get_bullet_sound.play()  # 效果失效时提醒一下
             
         # 更新屏幕
         pygame.display.update()
@@ -4031,7 +4066,7 @@ def congraduation_onelife():
         introText2 = introFont.render('For the reward, you can add me on Wechat by "zcy-scott" and we could be friends! Isn\'t that great? ^^', True, (0, 50, 100))
         introText3 = introFont.render('Now you can play all the five levels, you can also enjoy the classic game in the challenging mode', True, (0, 50, 100))
         introText4 = introFont.render('If you like this game, please check my Github homepage to find more interesting projets by me!', True, (0, 50, 100))       
-        introText5 = introFont.render('And if you have any suggestions, you are welcome to contact me by E-mail: zcy.scott@gmail.com ^^', True, (0, 50, 100))
+        introText5 = introFont.render('And if you have any suggestions, you are welcome to contact me by E-mail: zcy.scott@outlook.com ^^', True, (0, 50, 100))
         
         introText1_rect = introText1.get_rect()
         introText2_rect = introText2.get_rect()
@@ -4119,7 +4154,7 @@ def congraduation():
         introText2 = introFont.render('Now you can play all the five levels, you can also enjoy the classic game in the challenging mode', True, (0, 50, 100))
         introText3 = introFont.render('Or you can try to pass all the fifth levels with one life, if succeed you will get a mysterious reward ^^', True, (0, 50, 100))
         introText4 = introFont.render('If you like this game, please check my Github homepage to find more interesting projets by me!', True, (0, 50, 100))       
-        introText5 = introFont.render('And if you have any suggestions, you are welcome to contact me by E-mail: zcy.scott@gmail.com ^^', True, (0, 50, 100))
+        introText5 = introFont.render('And if you have any suggestions, you are welcome to contact me by E-mail: zcy.scott@outlook.com ^^', True, (0, 50, 100))
         
         introText1_rect = introText1.get_rect()
         introText2_rect = introText2.get_rect()
