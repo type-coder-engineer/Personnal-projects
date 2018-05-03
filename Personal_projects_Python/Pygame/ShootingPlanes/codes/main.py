@@ -323,7 +323,10 @@ def classicMode():
         # 绘制timeout按钮
         # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
-            bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
+            bullet_text = bullet_font.render('Bullet: ', True, (128, 128, 128))
+            position = SCREEN_WIDTH - 65
+            for i in range(0, 5):
+                screen.blit(bullet_img, ((position + i * 12), 10))
         else:
             if player.bullet > 0:
                 bullet_text = bullet_font.render('Bullet: ' , True, (128, 128, 128))
@@ -737,7 +740,10 @@ def level1(clock, player, flag_saw_boss, again):
         # 绘制子弹数目和bomb数目
         # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
-            bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
+            bullet_text = bullet_font.render('Bullet: ', True, (128, 128, 128))
+            position = SCREEN_WIDTH - 65
+            for i in range(0, 5):
+                screen.blit(bullet_img, ((position + i * 12), 10))
         else:
             if player.bullet > 0:
                 bullet_text = bullet_font.render('Bullet: ' , True, (128, 128, 128))
@@ -1223,7 +1229,10 @@ def level2(clock, player, flag_saw_boss, again):
         # 绘制子弹数目和bomb数目
         # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
-            bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
+            bullet_text = bullet_font.render('Bullet: ', True, (128, 128, 128))
+            position = SCREEN_WIDTH - 65
+            for i in range(0, 5):
+                screen.blit(bullet_img, ((position + i * 12), 10))
         else:
             if player.bullet > 0:
                 bullet_text = bullet_font.render('Bullet: ' , True, (128, 128, 128))
@@ -1763,7 +1772,10 @@ def level3(clock, player, flag_saw_boss, again):
         # 绘制子弹数目和bomb数目
         # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
-            bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
+            bullet_text = bullet_font.render('Bullet: ', True, (128, 128, 128))
+            position = SCREEN_WIDTH - 65
+            for i in range(0, 5):
+                screen.blit(bullet_img, ((position + i * 12), 10))
         else:
             if player.bullet > 0:
                 bullet_text = bullet_font.render('Bullet: ' , True, (128, 128, 128))
@@ -2362,7 +2374,10 @@ def level4(clock, player, flag_saw_boss, again):
         # 绘制子弹数目和bomb数目
         # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
-            bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
+            bullet_text = bullet_font.render('Bullet: ', True, (128, 128, 128))
+            position = SCREEN_WIDTH - 65
+            for i in range(0, 5):
+                screen.blit(bullet_img, ((position + i * 12), 10))
         else:
             if player.bullet > 0:
                 bullet_text = bullet_font.render('Bullet: ' , True, (128, 128, 128))
@@ -3069,7 +3084,10 @@ def level5(clock, player, flag_saw_boss, again):
         # 绘制子弹数目和bomb数目
         # bullet_font = pygame.font.Font('freesansbold.ttf', 20)
         if player.NL_bullet_time > 0:
-            bullet_text = bullet_font.render('Bullet: (^_^)', True, (128, 128, 128))
+            bullet_text = bullet_font.render('Bullet: ', True, (128, 128, 128))
+            position = SCREEN_WIDTH - 65
+            for i in range(0, 5):
+                screen.blit(bullet_img, ((position + i * 12), 10))
         else:
             if player.bullet > 0:
                 bullet_text = bullet_font.render('Bullet: ' , True, (128, 128, 128))
