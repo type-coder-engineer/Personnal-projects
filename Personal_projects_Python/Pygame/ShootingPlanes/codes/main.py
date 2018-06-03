@@ -28,7 +28,7 @@ pygame.display.set_caption('shootPlanes')
 pygame.mixer.init()
 bullet_sound     = pygame.mixer.Sound('resources/sound/bullet.wav')
 enemy_down_sound = pygame.mixer.Sound('resources/sound/enemy1_down.wav')
-boss_down_sound  = pygame.mixer.Sound('resources/sound/enemy22_down.wav')
+boss_down_sound  = pygame.mixer.Sound('resources/sound/enemy2_down.wav')
 boss_show_sound  = pygame.mixer.Sound('resources/sound/boss_show.wav')
 get_bullet_sound = pygame.mixer.Sound('resources/sound/get_bullet.wav')
 get_bomb_sound   = pygame.mixer.Sound('resources/sound/get_bomb.wav')
@@ -41,8 +41,8 @@ bullet_sound.set_volume(0.3)
 enemy_down_sound.set_volume(0.3)
 game_over_sound.set_volume(0.3)
 boss_show_sound.set_volume(0.3)
-get_bullet_sound.set_volume(0.3)
-get_bomb_sound.set_volume(0.3)
+get_bullet_sound.set_volume(0.4)
+get_bomb_sound.set_volume(0.4)
 bomb_sound.set_volume(0.3)
 beat_boss_sound.set_volume(0.3)
 bgm = pygame.mixer.Sound('resources/sound/game_music.wav')
@@ -2887,7 +2887,7 @@ def level5(clock, player, flag_saw_boss, again):
         for enemy1 in enemies1:
             enemy1.move((player.rect.left + player.rect.right) / 2 - (enemy1.rect.left + enemy1.rect.right) / 2)
             # 判断玩家是否被击中
-            if pygame.sprite.collide_rect(enemy1, player):
+            if pygame.sprite.collide_rect(enemy1, player) and not player.is_hit:
                 if (enemy1.rect.centery - player.rect.centery) < -35:
                     if abs(enemy1.rect.centerx - player.rect.centerx) < 30:
                         enemies1_down.add(enemy1)
@@ -2923,8 +2923,8 @@ def level5(clock, player, flag_saw_boss, again):
             else:
                 enemy2.img_index = 0
             screen.blit(enemy2.images[enemy2.img_index], enemy2.rect)
-            # 判断玩家是否被击中
-            if pygame.sprite.collide_rect(enemy2, player):
+            # 判断玩家是否被击中, 如果已经击中就不用重复判断了
+            if pygame.sprite.collide_rect(enemy2, player) and not player.is_hit:
                 if (enemy2.rect.centery - player.rect.centery) < -50:
                     if abs(enemy2.rect.centerx - player.rect.centerx) < 35:
                         enemies2_down.add(enemy2)
