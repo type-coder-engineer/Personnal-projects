@@ -92,15 +92,16 @@ def parsePage(page, interpreter, device, filename):
                 if (pattern):
                     date = getDate(info, pattern)
                     
-    if date and valueMax:
-        print 'Succeed in treating ', getLastAddress(filename)
-    else:
-        print 'In ' + getLastAddress(filename)
+    # if date and valueMax:
+        # print 'Succeed in treating ', getLastAddress(filename)
+    # else:
+    if not date or not valueMax:
+        print 'In file ' + getLastAddress(filename)
         if not date:
             print 'No date found!'  
         if not valueMax:
             print 'No price found!'
-    print '*****************************\n'
+        print '*****************************\n'
     return [date, valueMax]    
 
 def getValue(info):
