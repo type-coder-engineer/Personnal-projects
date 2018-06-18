@@ -9,6 +9,7 @@ from pdfminer.pdfdevice import PDFDevice
 from pdfminer.layout import *
 from pdfminer.converter import PDFPageAggregator
 import os
+import re
     
 def testMode(filename):
     fp = open(filename, 'rb')
@@ -87,20 +88,25 @@ def parsePage(page, interpreter, device, filename):
                 if (value > valueMax):
                     valueMax = value
                 continue
-            else:
-                pattern = dateMatchPattern(info)
-                if (pattern):
-                    date = getDate(info, pattern)
+            elif (date != 'confuse'):
+                dateTemp = dateMatchPattern(info)
+                if dateTemp and date:
+                    print 'We find more than one date in this file ', filename
+                    date = 'confuse'
+                elif not date:
+                    date = dateTemp
                     
     # if date and valueMax:
         # print 'Succeed in treating ', getLastAddress(filename)
     # else:
-    if not date or not valueMax:
-        print 'In file ' + getLastAddress(filename)
-        if not date:
-            print 'No date found!'  
+    if not valueMax or not date or date == 'confuse':
+        print 'In file ' + getLastAddress(filename) 
         if not valueMax:
             print 'No price found!'
+        if not date:
+            print 'No date found!' 
+        if date == 'confuse':
+            print 'Have found more than one date'
         print '*****************************\n'
     return [date, valueMax]    
 
@@ -115,19 +121,21 @@ def getValue(info):
     
 def dateMatchPattern(info):
     if ('年' in info and '月' in info and '日' in info):
-        return 1
-    # elif ():
-        # return 2
+        return getDate(info, 1)
     else:
-        return 0
+        numberMatch = re.findall('\d+', info)  # seperate the number from the space or special char
+        if len(numberMatch) >= 3:
+            info = '/'.join(one for one in numberMatch)
+            return getDate(info, 2) 
+        else:
+            return ''
         
 def getDate(info, pattern):
     date = ''
-    number = '0123456789'
-    allInfo = info.split('\n')
-    fullDate = ''
-    for one in allInfo:
-        if (pattern == 1):
+    if (pattern == 1):
+        allInfo = info.split('\n')
+        fullDate = ''
+        for one in allInfo:
             if ('年' in one and '月' in one and '日' in one):
                 fullDate = one
                 
@@ -148,12 +156,15 @@ def getDate(info, pattern):
                     # 没法直接这么替换，utf-8中中文和数字占用的字节数不一样，
                     # 也没法遍历然后替换不然会有3个'/', 直接数字节替换比较方便
                     
-        # elif (pattern == 2):
-        
-        
-        
-        
-        
+    elif (pattern == 2):
+        match = re.findall('20\d\d/\d\d/\d\d', info)
+        if not match:
+            date = ''
+        elif len(match) == 1:
+            date = match[0]
+        else:
+            date = 'confuse'
+            
     return date
         
 def getLastAddress(path):
