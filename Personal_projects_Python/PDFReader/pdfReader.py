@@ -22,29 +22,34 @@ def testMode(filename):
         raise PDFTextExtractionNotAllowed
     else:
         # 创建一个PDF资源管理器对象来存储共赏资源
-        rsrcmgr=PDFResourceManager()
+        rsrcmgr = PDFResourceManager()
         # 设定参数进行分析
-        laparams=LAParams()
+        laparams = LAParams()
         # 创建一个PDF设备对象
         # device=PDFDevice(rsrcmgr)
-        device=PDFPageAggregator(rsrcmgr,laparams=laparams)
+        device = PDFPageAggregator(rsrcmgr, laparams = laparams)
         # 创建一个PDF解释器对象
-        interpreter=PDFPageInterpreter(rsrcmgr,device)
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
         # 处理每一页
         for page in PDFPage.create_pages(document):
             interpreter.process_page(page)
             # 接受该页面的LTPage对象
             layout = device.get_result()
             for x in layout:
-                if(isinstance(x,LTTextBoxHorizontal)):
-                # try:
-                    # print x
-                # except:
-                    # continue
+                # if(isinstance(x, LTTextLine)):
+                    # print 'bingo'
+                    # data = x.get_text().encode('utf-8')
+                    # with open('testRecord.txt', 'a') as f:
+                        # f.write(data + '\n')
+                print x
+                if(isinstance(x, LTTextBoxHorizontal)):
+                    print 'ok'
                     data = x.get_text().encode('utf-8')
                     with open('testRecord.txt', 'a') as f:
                         f.write(data + '\n')
-                        
+                
+
+                
 def parsePDF(filename):
     fp = open(filename, 'rb')
     #来创建一个pdf文档分析器
@@ -81,13 +86,12 @@ def parsePage(page, interpreter, device, filename):
         # if(isinstance(x,LTTextBoxHorizontal) and ('￥' in x.get_text().encode('utf-8'))):
         if (isinstance(x, LTTextBoxHorizontal)):
             info = x.get_text().encode('utf-8')
-            # with open('testRecord.txt', 'a') as f:
-                # f.write(info + '\n')
-            if ('￥' in info):
-                value = getValue(info)
-                if (value > valueMax):
-                    valueMax = value
+
+            value = valueMatchPattern(info)
+            if (value > valueMax):
+                valueMax = value
                 continue
+                
             elif (date != 'confuse'):
                 dateTemp = dateMatchPattern(info)
                 if dateTemp and date:
@@ -95,10 +99,7 @@ def parsePage(page, interpreter, device, filename):
                     date = 'confuse'
                 elif not date:
                     date = dateTemp
-                    
-    # if date and valueMax:
-        # print 'Succeed in treating ', getLastAddress(filename)
-    # else:
+                   
     if not valueMax or not date or date == 'confuse':
         print 'In file ' + getLastAddress(filename) 
         if not valueMax:
@@ -108,6 +109,7 @@ def parsePage(page, interpreter, device, filename):
         if date == 'confuse':
             print 'Have found more than one date'
         print '*****************************\n'
+        
     return [date, valueMax]    
 
 def getValue(info):
@@ -119,6 +121,16 @@ def getValue(info):
     value = float(onlyNumber)
     return value
     
+def valueMatchPattern(info):
+    value = 0
+    if '￥' in info or '¥' in info:
+        value = getValue(info)
+    else:
+        valueInfo = re.findall('\d+\.\d\d$', info)
+        if (len(valueInfo) == 1):
+            value = float(valueInfo[0])
+    return value
+        
 def dateMatchPattern(info):
     if ('年' in info and '月' in info and '日' in info):
         return getDate(info, 1)
@@ -172,7 +184,8 @@ def getLastAddress(path):
     return allInfo[-1]
     
 if __name__ =="__main__": 
-    parsePDF('taxi1.pdf')
+    # parsePDF('taxi1.pdf')
+    testMode('6.5_6.10.pdf')
     
     print 'All done, enjoy!'
     
