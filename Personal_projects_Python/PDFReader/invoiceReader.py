@@ -2,6 +2,7 @@
 
 from pdfReader import *
 from easyExcel import *
+import datetime
 
 def treatInvoice(path):
     expensePath = getLastAddress(path)
@@ -9,12 +10,18 @@ def treatInvoice(path):
     if (os.path.isfile(filename)):
         os.remove(filename)
     expenseFile = easyExcel()
-    row = 1
-    print 'Initialize the Excel file, begin to parse the files\n'
+    print 'Initialize the Excel file, begin to write the header\n'
+    row = writeHeader(expenseFile, expensePath)
+    if not row:
+        print 'Not able to write in the excel file, please check the language, only available with English and French for now'
+        return
+    else:
+        beginRow = row
+    print 'Begin to parse the invoices files\n'
     lastClass = ''
     dictClass = {}
     noKeyCount = 0
-    rowLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    columnLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     
     for root, dirs, files in os.walk(path):
         for file in files:
@@ -25,21 +32,16 @@ def treatInvoice(path):
                     print 'Now we are parsing the ' + fileType + ' invoices'
                 
             if (lastClass != fileType):
-                if (lastClass == 'hotel'):
-                    column = 4
-                elif (lastClass == 'taxi'):
-                    column = 6
-                else:
-                    column = 8                
+                column = getColumn(lastClass)             
                 
                 allKeys = dictClass.keys()
                 allKeys.sort()  # 这里需要赋值一下然后sort()
                 for one in allKeys:
                     info = dictClass[one]
-                    expenseFile.setCell(row, 1, info[0], 'Feuil1')
-                    expenseFile.setCell(row, column, info[1], 'Feuil1')
-                    equalBlanks = '=' + rowLetter[column - 1] + str(row)
-                    expenseFile.setCell(row, 12, equalBlanks, 'Feuil1')
+                    writeToCell(expenseFile, row, 1, info[0])
+                    writeToCell(expenseFile, row, column, info[1])
+                    equalBlanks = '=' + columnLetter[column - 1] + str(row)
+                    writeToCell(expenseFile, row, 10, equalBlanks)
                     row += 1
 
                 lastClass = fileType
@@ -60,24 +62,22 @@ def treatInvoice(path):
                     print '*****************************\n'
                 
     if dictClass:
-        if (lastClass == 'hotel'):
-            column = 4
-        elif (lastClass == 'taxi'):
-            column = 6
-        else:
-            column = 8  
+        column = getColumn(lastClass)
                     
         allKeys = dictClass.keys()
         allKeys.sort()
         for one in allKeys:
             info = dictClass[one]
-            expenseFile.setCell(row, 1, info[0], 'Feuil1')
-            expenseFile.setCell(row, column, info[1], 'Feuil1')
-            equalBlanks = '=' + rowLetter[column - 1] + str(row)
-            expenseFile.setCell(row, 12, equalBlanks, 'Feuil1')
+            writeToCell(expenseFile, row, 1, info[0])
+            writeToCell(expenseFile, row, column, info[1])
+            equalBlanks = '=' + columnLetter[column - 1] + str(row)
+            writeToCell(expenseFile, row, 10, equalBlanks)
             row += 1
-            
-    expenseFile.save(filename) 
+
+    print 'Begin to resume all the sub total\n'            
+    writeEnder(expenseFile, beginRow, row)
+
+    expenseFile.save(filename)
     expenseFile.close()
     
 def getDateKey(date, noKeyCount, dictClass):
@@ -90,6 +90,83 @@ def getDateKey(date, noKeyCount, dictClass):
         key = -noKeyCount
         noKeyCount = noKeyCount + 1
     return [key, noKeyCount]
+
+def writeToCell(file, row, column, info):
+    for i in range(2):
+        try:
+            file.setCell(row, column, info, 'Feuil1')
+            return 1
+        except:
+            print ''
+        
+        try:
+            file.setCell(row, column, info, 'Sheet1')
+            return 1
+        except:
+            print ''
+    return 0
+       
+def writeHeader(file, expensePath):
+    row = 1
+    res = writeToCell(file, row, 5, 'Altios China')
+    if not res:
+        return 0
+    row += 1
+    writeToCell(file, row, 5, expensePath)
+    row += 2
+    writeToCell(file, row, 1, 'Form No')
+    currentYear = datetime.datetime.now().strftime('%Y')
+    formNb = 'BAL' + currentYear[-2:] + '0' + expensePath[-2:]
+    writeToCell(file, row, 2, formNb)
+
+    writeToCell(file, row, 4, 'Date')
+    currentDate = datetime.datetime.now().strftime('%Y-%m-%d')
+    writeToCell(file, row, 5, currentDate)
+    row += 2
+    
+    writeToCell(file, row, 1, 'Date')
+    writeToCell(file, row, 2, 'City')
+    writeToCell(file, row, 3, 'Client')
+    writeToCell(file, row, 4, 'Hotel')
+    writeToCell(file, row, 5, 'Taxi')
+    writeToCell(file, row, 6, 'Plane')
+    writeToCell(file, row, 7, 'Train')
+    writeToCell(file, row, 8, 'Telephone')
+    writeToCell(file, row, 9, 'Others')
+    writeToCell(file, row, 10, 'Total in RMB')
+    row += 2
+    return row
+    
+def writeEnder(file, beginRow, row):
+    columnLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    endRow = row - 1
+    row += 1
+    
+    writeToCell(file, row, 1, 'Sub total')
+    for column in range(4, 11):
+        subTotal = '=SOMME(' + columnLetter[column - 1] + str(beginRow) + ':'  + columnLetter[column - 1] + str(endRow) + ')'
+        writeToCell(file, row, column, subTotal)
+        
+    equalBlanks = '=' + columnLetter[9] + str(row)
+    row += 2
+    
+    writeToCell(file, row, 9, 'Total due')
+    writeToCell(file, row, 10, equalBlanks)
+
+def getColumn(itemClass):
+    if (itemClass == 'hotel'):
+        column = 4
+    elif (itemClass == 'taxi'):
+        column = 5
+    elif (itemClass == 'plane'):
+        column = 6
+    elif (itemClass == 'train'):
+        column = 7
+    elif (itemClass == 'telephone'):
+        column = 8
+    else:
+        column = 9
+    return column
 
 if __name__ == '__main__':
     path = os.path.join(os.getcwd())
