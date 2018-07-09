@@ -171,7 +171,7 @@ def getColumn(itemClass):
 if __name__ == '__main__':
     path = os.path.join(os.getcwd())
     treatInvoice(path)
-    print 'All done, enjoy!'
+    raw_input('All done, enjoy! Press any key to continue')
     
     
     
