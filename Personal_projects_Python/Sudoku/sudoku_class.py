@@ -6,7 +6,7 @@ import time
 def shuffling(all):
     new_list = all[:]
     for index in xrange(1, len(all)):
-        index_exc = random.randint(index)
+        index_exc = random.randint(0, index)
         new_list[index], new_list[index_exc] = new_list[index_exc], new_list[index]
     return new_list
  
