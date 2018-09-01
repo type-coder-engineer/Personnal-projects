@@ -945,6 +945,7 @@ class SudokuGUI:
                 newWindow.title("参考答案")
             else:
                 newWindow.title('answer')
+            newWindow.iconbitmap('sudokuIco.ico')
             newFrame = Canvas(newWindow, width = 500, height = 500, bg = '#eeeebb')
             
         for i in xrange(9):
