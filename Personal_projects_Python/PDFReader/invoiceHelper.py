@@ -41,7 +41,7 @@ def treatInvoice(path):
                     writeToCell(expenseFile, row, 1, info[0])
                     writeToCell(expenseFile, row, column, info[1])
                     equalBlanks = '=' + columnLetter[column - 1] + str(row)
-                    writeToCell(expenseFile, row, 10, equalBlanks)
+                    writeToCell(expenseFile, row, 11, equalBlanks)
                     row += 1
 
                 lastClass = fileType
@@ -71,7 +71,7 @@ def treatInvoice(path):
             writeToCell(expenseFile, row, 1, info[0])
             writeToCell(expenseFile, row, column, info[1])
             equalBlanks = '=' + columnLetter[column - 1] + str(row)
-            writeToCell(expenseFile, row, 10, equalBlanks)
+            writeToCell(expenseFile, row, 11, equalBlanks)
             row += 1
 
     print 'Begin to resume all the sub total\n'            
@@ -132,8 +132,9 @@ def writeHeader(file, expensePath):
     writeToCell(file, row, 6, 'Plane')
     writeToCell(file, row, 7, 'Train')
     writeToCell(file, row, 8, 'Telephone')
-    writeToCell(file, row, 9, 'Others')
-    writeToCell(file, row, 10, 'Total in RMB')
+    writeToCell(file, row, 9, 'Restaurant')
+    writeToCell(file, row, 10, 'Others')
+    writeToCell(file, row, 11, 'Total in RMB')
     row += 2
     return row
     
@@ -143,15 +144,15 @@ def writeEnder(file, beginRow, row):
     row += 1
     
     writeToCell(file, row, 1, 'Sub total')
-    for column in range(4, 11):
+    for column in range(4, 12):
         subTotal = '=SOMME(' + columnLetter[column - 1] + str(beginRow) + ':'  + columnLetter[column - 1] + str(endRow) + ')'
         writeToCell(file, row, column, subTotal)
         
-    equalBlanks = '=' + columnLetter[9] + str(row)
+    equalBlanks = '=' + columnLetter[10] + str(row)
     row += 2
     
-    writeToCell(file, row, 9, 'Total due')
-    writeToCell(file, row, 10, equalBlanks)
+    writeToCell(file, row, 10, 'Total due')
+    writeToCell(file, row, 11, equalBlanks)
 
 def getColumn(itemClass):
     if (itemClass == 'hotel'):
@@ -164,8 +165,10 @@ def getColumn(itemClass):
         column = 7
     elif (itemClass == 'telephone'):
         column = 8
-    else:
+    elif (itemClass == 'restaurant'):
         column = 9
+    else:
+        column = 10
     return column
 
 if __name__ == '__main__':
