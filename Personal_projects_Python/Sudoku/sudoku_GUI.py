@@ -3,12 +3,12 @@ from Tkinter import *
 import tkMessageBox 
 from PIL import Image, ImageTk
 import ttk
-# from sudoku_class import *
 import time
 import threading
 import random
 import time
 import win32api,win32con 
+# to make a .exe file, just tap 'pyinstaller sudoku_GUI.spec'
 
 def shuffling(all):
     new_list = all[:]
@@ -357,9 +357,9 @@ class SudokuGUI:
             self.level = StringVar()
             self.level.set("median") # 默认初始值
             ttk.Combobox(self.frame, textvariable = self.level, values = ["easy", "median", "hard"]).place(x = WIDTH / 2, y = 280, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 15), text = 'sudoku puzzle', width = 12, height = 1, command = self.sudokuPuzzleWait, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 3, y = 220, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 15), text = 'challenge mode', width = 12, height = 1, command = self.sudokuChallengeWait, fg = '#000000', bg = '#cccc99').place(x = WIDTH * 2 / 3, y = 220, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 15), text = 'solve sudoku', width = 12, height = 1, command = self.sudokuSolve, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 2, y = 340, anchor = 'center')
+            Button(self.frame, font = ("Purisa", 14), text = 'sudoku puzzle', width = 15, height = 1, command = self.sudokuPuzzleWait, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 3, y = 220, anchor = 'center')
+            Button(self.frame, font = ("Purisa", 14), text = 'challenge mode', width = 15, height = 1, command = self.sudokuChallengeWait, fg = '#000000', bg = '#cccc99').place(x = WIDTH * 2 / 3, y = 220, anchor = 'center')
+            Button(self.frame, font = ("Purisa", 14), text = 'solve sudoku', width = 15, height = 1, command = self.sudokuSolve, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 2, y = 340, anchor = 'center')
             Button(self.frame, font = ("Purisa", 12), text = '更换语言', width = 12, height = 1, command = self.changeLanguage, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 2, y = 440, anchor = 'center')
         
         self.frame.pack()
@@ -385,7 +385,7 @@ class SudokuGUI:
         if self.flag_language == 'ch':
             Label(self.frame, font = ("Purisa", 22), text = "正在生成题目   ", fg = '#000000', bg = '#eeeebb').place(x = 150, y = 200, anchor = SW)
         else:
-            Label(self.frame, font = ("Purisa", 22), text = "The puzzle is generating   ", fg = '#000000', bg = '#eeeebb').place(x = 100, y = 200, anchor = SW)
+            Label(self.frame, font = ("Purisa", 20), text = "The puzzle is generating   ", fg = '#000000', bg = '#eeeebb').place(x = 60, y = 200, anchor = SW)
         self.frame.pack()
         th_animation = threading.Thread(target = self.signalPuzzleWait) # 另一个线程用来产生动画效果
         th_animation.setDaemon(True)
@@ -405,7 +405,7 @@ class SudokuGUI:
         if self.flag_language == 'ch':
             Label(self.frame, font = ("Purisa", 22), text = "正在生成题目   ", fg = '#000000', bg = '#eeeebb').place(x = 150, y = 200, anchor = SW)
         else:
-            Label(self.frame, font = ("Purisa", 22), text = "The puzzle is generating   ", fg = '#000000', bg = '#eeeebb').place(x = 100, y = 200, anchor = SW)
+            Label(self.frame, font = ("Purisa", 20), text = "The puzzle is generating   ", fg = '#000000', bg = '#eeeebb').place(x = 60, y = 200, anchor = SW)
         self.frame.pack()
         th_animation = threading.Thread(target = self.signalChallengeWait) # 另一个线程用来产生动画效果
         th_animation.setDaemon(True)
@@ -420,22 +420,22 @@ class SudokuGUI:
             if self.flag_language == 'ch':
                 Label(self.frame, font = ("Purisa", 22), text = "正在生成题目...", fg = '#000000', bg = '#eeeebb').place(x = 150, y = 200, anchor = SW)
             else:
-                Label(self.frame, font = ("Purisa", 22), text = "The puzzle is generating...", fg = '#000000', bg = '#eeeebb').place(x = 100, y = 200, anchor = SW)
+                Label(self.frame, font = ("Purisa", 20), text = "The puzzle is generating...", fg = '#000000', bg = '#eeeebb').place(x = 60, y = 200, anchor = SW)
         elif (index + 1) % 4 == 0:
             if self.flag_language == 'ch':
                 Label(self.frame, font = ("Purisa", 22), text = "正在生成题目.. ", fg = '#000000', bg = '#eeeebb').place(x = 150, y = 200, anchor = SW)
             else:
-                Label(self.frame, font = ("Purisa", 22), text = "The puzzle is generating.. ", fg = '#000000', bg = '#eeeebb').place(x = 100, y = 200, anchor = SW)
+                Label(self.frame, font = ("Purisa", 20), text = "The puzzle is generating.. ", fg = '#000000', bg = '#eeeebb').place(x = 60, y = 200, anchor = SW)
         elif (index + 2) % 4 == 0:
             if self.flag_language == 'ch':
                 Label(self.frame, font = ("Purisa", 22), text = "正在生成题目.  ", fg = '#000000', bg = '#eeeebb').place(x = 150, y = 200, anchor = SW)
             else:
-                Label(self.frame, font = ("Purisa", 22), text = "The puzzle is generating.  ", fg = '#000000', bg = '#eeeebb').place(x = 100, y = 200, anchor = SW)
+                Label(self.frame, font = ("Purisa", 20), text = "The puzzle is generating.  ", fg = '#000000', bg = '#eeeebb').place(x = 60, y = 200, anchor = SW)
         else:
             if self.flag_language == 'ch':
                 Label(self.frame, font = ("Purisa", 22), text = "正在生成题目   ", fg = '#000000', bg = '#eeeebb').place(x = 150, y = 200, anchor = SW)
             else:
-                Label(self.frame, font = ("Purisa", 22), text = "The puzzle is generating   ", fg = '#000000', bg = '#eeeebb').place(x = 100, y = 200, anchor = SW)
+                Label(self.frame, font = ("Purisa", 20), text = "The puzzle is generating   ", fg = '#000000', bg = '#eeeebb').place(x = 60, y = 200, anchor = SW)
         self.frame.pack()
     
     def signalPuzzleWait(self):
@@ -493,7 +493,7 @@ class SudokuGUI:
             Label(self.frame, font = ("Purisa", 18), text = "You chose the challenging mode", fg = '#000000', bg = '#eeeebb').place(x = WIDTH / 2, y = 130, anchor = 'center')
             Label(self.frame, font = ("Purisa", 18), text = "Click 'Yes!' and start the counting down", fg = '#000000', bg = '#eeeebb').place(x = WIDTH / 2, y = 180, anchor = 'center')
             Button(self.frame, font = ("Purisa", 15), text = 'Yes!', width = 12, height = 1, command = self.sudokuChallengeShow, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 2, y = 280, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 15), text = 'return to menu', width = 12, height = 1, command = self.main, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 2, y = 370, anchor = 'center')    
+            Button(self.frame, font = ("Purisa", 12), text = 'return to menu', width = 18, height = 1, command = self.main, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 2, y = 370, anchor = 'center')    
         
         self.frame.pack()
         
@@ -591,8 +591,8 @@ class SudokuGUI:
         else:
             Button(self.frame, font = ("Purisa", 12), text = 'submit', width = 12, height = 1, command = self.submit, fg = '#000000', bg = '#cccc99').place(x = 150, y = 480, anchor = 'center')
             Button(self.frame, font = ("Purisa", 12), text = 'answer', width = 12, height = 1, command = self.getAnswer, fg = '#000000', bg = '#cccc99').place(x = 350, y = 480, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 12), text = 'new sudoku', width = 12, height = 1, command = self.sudokuPuzzleWait, fg = '#000000', bg = '#cccc99').place(x = 150, y = 530, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 12), text = 'return to menu', width = 12, height = 1, command = self.main, fg = '#000000', bg = '#cccc99').place(x = 350, y = 530, anchor = 'center')
+            Button(self.frame, font = ("Purisa", 12), text = 'new sudoku', width = 15, height = 1, command = self.sudokuPuzzleWait, fg = '#000000', bg = '#cccc99').place(x = 150, y = 530, anchor = 'center')
+            Button(self.frame, font = ("Purisa", 12), text = 'return to menu', width = 18, height = 1, command = self.main, fg = '#000000', bg = '#cccc99').place(x = 350, y = 530, anchor = 'center')
         
         self.frame.pack()
         # print 'new'
@@ -697,8 +697,8 @@ class SudokuGUI:
         else:
             Button(self.frame, font = ("Purisa", 12), text = 'submit', width = 12, height = 1, command = self.submit, fg = '#000000', bg = '#cccc99').place(x = 150, y = 480, anchor = 'center')
             Button(self.frame, font = ("Purisa", 12), text = 'answer', width = 12, height = 1, command = self.getAnswer, fg = '#000000', bg = '#cccc99').place(x = 350, y = 480, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 12), text = 'new sudoku', width = 12, height = 1, command = self.sudokuChallengeWait, fg = '#000000', bg = '#cccc99').place(x = 150, y = 530, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 12), text = 'return to menu', width = 12, height = 1, command = self.main, fg = '#000000', bg = '#cccc99').place(x = 350, y = 530, anchor = 'center')
+            Button(self.frame, font = ("Purisa", 12), text = 'new sudoku', width = 15, height = 1, command = self.sudokuChallengeWait, fg = '#000000', bg = '#cccc99').place(x = 150, y = 530, anchor = 'center')
+            Button(self.frame, font = ("Purisa", 12), text = 'return to menu', width = 18, height = 1, command = self.main, fg = '#000000', bg = '#cccc99').place(x = 350, y = 530, anchor = 'center')
          
         self.frame.pack()
         
@@ -899,8 +899,8 @@ class SudokuGUI:
             Button(self.frame, font = ("Purisa", 12), text = '回到主菜单', width = 12, height = 1, command =self.main, fg = '#000000', bg = '#cccc99').place(x = WIDTH * 3 / 4, y = 510, anchor = 'center')
         else:
             Button(self.frame, font = ("Purisa", 12), text = 'slove it!', width = 12, height = 1, command =self.solve, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 2, y = 460, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 12), text = 'slove new puzzle', width = 12, height = 1, command =self.sudokuSolve, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 4, y = 510, anchor = 'center')
-            Button(self.frame, font = ("Purisa", 12), text = 'return to menu', width = 12, height = 1, command =self.main, fg = '#000000', bg = '#cccc99').place(x = WIDTH * 3 / 4, y = 510, anchor = 'center')
+            Button(self.frame, font = ("Purisa", 12), text = 'slove new puzzle', width = 18, height = 1, command =self.sudokuSolve, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 4, y = 510, anchor = 'center')
+            Button(self.frame, font = ("Purisa", 12), text = 'return to menu', width = 18, height = 1, command =self.main, fg = '#000000', bg = '#cccc99').place(x = WIDTH * 3 / 4, y = 510, anchor = 'center')
         
         self.frame.pack()
         
@@ -939,55 +939,154 @@ class SudokuGUI:
                 tkMessageBox.showwarning("检查题目", "这个题目有多个解，你可能做到了假数独。。。")
             else:
                 tkMessageBox.showwarning("check puzzle", "This puzzle has plenty solutions, it may be a fake puzzle...")
+            self.showAnswer(solved)
         else:
+            self.showAnswer(solved)
+    
+    def showAnswer(self, solved):
+        if (len(solved) == 1):
             newWindow = Tk()
             if self.flag_language == 'ch':
                 newWindow.title("参考答案")
             else:
                 newWindow.title('answer')
             newWindow.iconbitmap('sudokuIco.ico')
-            newFrame = Canvas(newWindow, width = 500, height = 500, bg = '#eeeebb')
+            newFrame = Canvas(newWindow, width = 1000, height = 500, bg = '#eeeebb')
             
-        for i in xrange(9):
-            for j in xrange(9):
-                if i < 3:
-                    pos_x = i*45 + 75
-                if j < 3:
-                    pos_y = j*45 + 30
-                if i >= 3 and i < 6:
-                    pos_x = i*45 + 75
-                if j >= 3 and j < 6:
-                    pos_y = j*45 + 30
-                if i >= 6:
-                    pos_x = i*45 + 75
-                if j >= 6:
-                    pos_y = j*45 + 30
-                Label(newFrame, width = 3, height = 2, text = str(solved[0][i*9 + j]), fg = '#000000', bg = '#eeeebb').place(x = pos_x, y = pos_y, anchor = 'center')
-                
-        newFrame.create_rectangle(55, 10, 455, 410)
-        newFrame.create_line(99, 10, 99, 410, dash = (4, 4))
-        newFrame.create_line(142, 10, 142, 410, dash = (4, 4))
-        newFrame.create_line(187, 10, 187, 410)          
-        newFrame.create_line(232, 10, 232, 410, dash = (4, 4))
-        newFrame.create_line(278, 10, 278, 410, dash = (4, 4))
-        newFrame.create_line(323, 10, 323, 410)    
-        newFrame.create_line(369, 10, 369, 410, dash = (4, 4))
-        newFrame.create_line(413, 10, 413, 410, dash = (4, 4))
-        newFrame.create_line(55, 51, 455, 51, dash = (4, 4)) 
-        newFrame.create_line(55, 95, 455, 95, dash = (4, 4)) 
-        newFrame.create_line(55, 142, 455, 142)    
-        newFrame.create_line(55, 186, 455, 186, dash = (4, 4)) 
-        newFrame.create_line(55, 230, 455, 230, dash = (4, 4)) 
-        newFrame.create_line(55, 277, 455, 277)    
-        newFrame.create_line(55, 320, 455, 320, dash = (4, 4)) 
-        newFrame.create_line(55, 367, 455, 367, dash = (4, 4)) 
+            for i in xrange(9):
+                for j in xrange(9):
+                    if i < 3:
+                        pos_x = i*45 + 75
+                    if j < 3:
+                        pos_y = j*45 + 30
+                    if i >= 3 and i < 6:
+                        pos_x = i*45 + 75
+                    if j >= 3 and j < 6:
+                        pos_y = j*45 + 30
+                    if i >= 6:
+                        pos_x = i*45 + 75
+                    if j >= 6:
+                        pos_y = j*45 + 30
+                    Label(newFrame, width = 3, height = 2, text = str(solved[0][i*9 + j]), fg = '#000000', bg = '#eeeebb').place(x = pos_x, y = pos_y, anchor = 'center')
+                    
+            newFrame.create_rectangle(55, 10, 455, 410)
+            newFrame.create_line(99, 10, 99, 410, dash = (4, 4))
+            newFrame.create_line(142, 10, 142, 410, dash = (4, 4))
+            newFrame.create_line(187, 10, 187, 410)          
+            newFrame.create_line(232, 10, 232, 410, dash = (4, 4))
+            newFrame.create_line(278, 10, 278, 410, dash = (4, 4))
+            newFrame.create_line(323, 10, 323, 410)    
+            newFrame.create_line(369, 10, 369, 410, dash = (4, 4))
+            newFrame.create_line(413, 10, 413, 410, dash = (4, 4))
+            newFrame.create_line(55, 51, 455, 51, dash = (4, 4)) 
+            newFrame.create_line(55, 95, 455, 95, dash = (4, 4)) 
+            newFrame.create_line(55, 142, 455, 142)    
+            newFrame.create_line(55, 186, 455, 186, dash = (4, 4)) 
+            newFrame.create_line(55, 230, 455, 230, dash = (4, 4)) 
+            newFrame.create_line(55, 277, 455, 277)    
+            newFrame.create_line(55, 320, 455, 320, dash = (4, 4)) 
+            newFrame.create_line(55, 367, 455, 367, dash = (4, 4)) 
+            
+            Button(newFrame, font = ("Purisa", 12), text="OK!", width = 12, height = 1, command = newWindow.destroy, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 2, y = 450, anchor = 'center')
+            newFrame.pack()
+            newWindow.mainloop()
         
-        Button(newFrame, font = ("Purisa", 12), text="OK!", width = 12, height = 1, command = newWindow.destroy, fg = '#000000', bg = '#cccc99').place(x = WIDTH / 2, y = 450, anchor = 'center')
-        newFrame.pack()
-        newWindow.mainloop()
-
+        else:
+            newWindow = Tk()
+            if self.flag_language == 'ch':
+                newWindow.title("部分参考答案")
+            else:
+                newWindow.title('some answers')
+            newWindow.iconbitmap('sudokuIco.ico')
+            newFrame = Canvas(newWindow, width = 1000, height = 500, bg = '#eeeebb')
+                       
+            for i in xrange(9):
+                for j in xrange(9):
+                    if i < 3:
+                        pos_x = i*45 + 75
+                    if j < 3:
+                        pos_y = j*45 + 30
+                    if i >= 3 and i < 6:
+                        pos_x = i*45 + 75
+                    if j >= 3 and j < 6:
+                        pos_y = j*45 + 30
+                    if i >= 6:
+                        pos_x = i*45 + 75
+                    if j >= 6:
+                        pos_y = j*45 + 30
+                    Label(newFrame, width = 3, height = 2, text = str(solved[0][i*9 + j]), fg = '#000000', bg = '#eeeebb').place(x = pos_x, y = pos_y, anchor = 'center')
+            
+            newFrame.create_rectangle(55, 10, 455, 410)
+            newFrame.create_line(99, 10, 99, 410, dash = (4, 4))
+            newFrame.create_line(142, 10,  142, 410, dash = (4, 4))
+            newFrame.create_line(187, 10,  187, 410)          
+            newFrame.create_line(232, 10,  232, 410, dash = (4, 4))
+            newFrame.create_line(278, 10,  278, 410, dash = (4, 4))
+            newFrame.create_line(323, 10,  323, 410)    
+            newFrame.create_line(369, 10,  369, 410, dash = (4, 4))
+            newFrame.create_line(413, 10,  413, 410, dash = (4, 4))
+            newFrame.create_line(55,  51,  455, 51, dash = (4, 4)) 
+            newFrame.create_line(55,  95,  455, 95, dash = (4, 4)) 
+            newFrame.create_line(55,  142, 455, 142)    
+            newFrame.create_line(55,  186, 455, 186, dash = (4, 4)) 
+            newFrame.create_line(55,  230, 455, 230, dash = (4, 4)) 
+            newFrame.create_line(55,  277, 455, 277)    
+            newFrame.create_line(55,  320, 455, 320, dash = (4, 4)) 
+            newFrame.create_line(55,  367, 455, 367, dash = (4, 4)) 
+             
+            for i in xrange(9):
+                for j in xrange(9):
+                    if i < 3:
+                        pos_x = i*45 + 575
+                    if j < 3:
+                        pos_y = j*45 + 30
+                    if i >= 3 and i < 6:
+                        pos_x = i*45 + 575
+                    if j >= 3 and j < 6:
+                        pos_y = j*45 + 30
+                    if i >= 6:
+                        pos_x = i*45 + 575
+                    if j >= 6:
+                        pos_y = j*45 + 30
+                    Label(newFrame, width = 3, height = 2, text = str(solved[1][i*9 + j]), fg = '#000000', bg = '#eeeebb').place(x = pos_x, y = pos_y, anchor = 'center')
+                    
+            newFrame.create_rectangle(555, 10, 955, 410)
+            newFrame.create_line(599, 10,  599, 410, dash = (4, 4))
+            newFrame.create_line(642, 10,  642, 410, dash = (4, 4))
+            newFrame.create_line(687, 10,  687, 410)          
+            newFrame.create_line(732, 10,  732, 410, dash = (4, 4))
+            newFrame.create_line(778, 10,  778, 410, dash = (4, 4))
+            newFrame.create_line(823, 10,  823, 410)    
+            newFrame.create_line(869, 10,  869, 410, dash = (4, 4))
+            newFrame.create_line(913, 10,  913, 410, dash = (4, 4))
+            newFrame.create_line(555, 51,  955, 51, dash = (4, 4)) 
+            newFrame.create_line(555, 95,  955, 95, dash = (4, 4)) 
+            newFrame.create_line(555, 142, 955, 142)    
+            newFrame.create_line(555, 186, 955, 186, dash = (4, 4)) 
+            newFrame.create_line(555, 230, 955, 230, dash = (4, 4)) 
+            newFrame.create_line(555, 277, 955, 277)    
+            newFrame.create_line(555, 320, 955, 320, dash = (4, 4)) 
+            newFrame.create_line(555, 367, 955, 367, dash = (4, 4)) 
+            
+            Button(newFrame, font = ("Purisa", 12), text = "OK!", width = 12, height = 1, command = newWindow.destroy, fg = '#000000', bg = '#cccc99').place(x = 500, y = 450, anchor = 'center')
+            newFrame.pack()
+            newWindow.mainloop()
+        
+        
 lock = threading.Lock()
 WIDTH = 500
 HEIGHT = 550            
 app = SudokuGUI()
 app.window.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
