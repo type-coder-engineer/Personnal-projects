@@ -129,10 +129,10 @@ def writeHeader(file, expensePath):
     writeToCell(file, row, 3, 'Client')
     writeToCell(file, row, 4, 'Hotel')
     writeToCell(file, row, 5, 'Taxi')
-    writeToCell(file, row, 6, 'Plane')
-    writeToCell(file, row, 7, 'Train')
-    writeToCell(file, row, 8, 'Telephone')
-    writeToCell(file, row, 9, 'Restaurant')
+    writeToCell(file, row, 6, 'Restaurant')
+    writeToCell(file, row, 7, 'Plane')
+    writeToCell(file, row, 8, 'Train')
+    writeToCell(file, row, 9, 'Telephone')
     writeToCell(file, row, 10, 'Others')
     writeToCell(file, row, 11, 'Total in RMB')
     row += 2
@@ -159,13 +159,13 @@ def getColumn(itemClass):
         column = 4
     elif (itemClass == 'taxi'):
         column = 5
-    elif (itemClass == 'plane'):
-        column = 6
-    elif (itemClass == 'train'):
-        column = 7
-    elif (itemClass == 'telephone'):
-        column = 8
     elif (itemClass == 'restaurant'):
+        column = 6
+    elif (itemClass == 'plane'):
+        column = 7
+    elif (itemClass == 'train'):
+        column = 8
+    elif (itemClass == 'telephone'):
         column = 9
     else:
         column = 10
