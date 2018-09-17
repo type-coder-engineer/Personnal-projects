@@ -21,7 +21,7 @@ BlockAreaCatch::BlockAreaCatch(int level, QWidget* parent)
         }
         myRow = 3;
         myColumn = 6;
-        counter = 600; // 设置的时间间隔是100,也就是0.1s，所以这里600是60秒
+        counter = 500; // 设置的时间间隔是100,也就是0.1s，所以这里500是50秒
     }
     else if (myLevel == 2) {
         int index = 1;
@@ -33,7 +33,7 @@ BlockAreaCatch::BlockAreaCatch(int level, QWidget* parent)
         }
         myRow = 4;
         myColumn = 7;
-        counter = 900;  // 90 秒
+        counter = 750;  // 75 秒
     }
     else {
         int index = 88;
@@ -43,7 +43,7 @@ BlockAreaCatch::BlockAreaCatch(int level, QWidget* parent)
         }
         myRow = 5;
         myColumn = 8;
-        counter = 1500;  // 150 秒
+        counter = 1000;  // 100 秒
     }
 
     mygame = new fun(myRow, myColumn);

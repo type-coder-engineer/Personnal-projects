@@ -52,10 +52,10 @@ void MainWindow::on_catchWin(){
         first100 = true;
     }
     if ((find_it(144, caught) || find_it(145, caught) || find_it(146, caught) || find_it(150, caught) || find_it(151, caught)) && !superRare && first100) {
-        QMessageBox::information(this, tr("祝贺你"), tr("你首次抓住了超级罕见的神奇宝贝，成为高级训练师！"));
+        QMessageBox::information(this, tr("祝贺你"), tr("你已经抓住了包括超级罕见神奇宝贝的多数神奇宝贝，成为高级训练师！"));
         superRare = true;
     }
-    if (caught.size() == 151) {
+    if (caught.size() == 151 && !catchAll) {
         QMessageBox::information(this, tr("祝贺你"), tr("你已经抓住了所有神奇宝贝，成为传奇训练师！"));
         catchAll = true;
     }
@@ -281,6 +281,11 @@ void MainWindow::writeSetting() {
         mySettings.setValue("one", caught.at(i));
     }
     mySettings.endArray();
+
+    mySettings.setValue("first50", first50);
+    mySettings.setValue("first100", first100);
+    mySettings.setValue("superRare", superRare);
+    mySettings.setValue("catchAll", catchAll);
 }
 
 void MainWindow::readSetting() {
@@ -296,6 +301,11 @@ void MainWindow::readSetting() {
         caught.push_back(mySettings.value("one").toInt());
     }
     mySettings.endArray();
+
+    first50 = mySettings.value("first50").toBool();
+    first100 = mySettings.value("first100").toBool();
+    superRare = mySettings.value("superRare").toBool();
+    catchAll = mySettings.value("catchAll").toBool();
 }
 
 // 重载关闭事件来加入保存设置
