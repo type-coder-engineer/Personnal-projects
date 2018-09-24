@@ -13,7 +13,7 @@ def findDrives():
 def iterateFiles(directory):
     if not os.path.isdir(directory):
         return []
-    formList = ['doc', 'txt', 'xls', 'ppt', 'pdf']
+    formList = ['doc', 'txt', 'xls', 'xlsx', 'ppt', 'pdf', 'jpg', 'png']
     result = []
     for root, dirs, files in os.walk(directory, topdown = True):
         for file in files:
