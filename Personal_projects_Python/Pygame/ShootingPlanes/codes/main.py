@@ -2121,6 +2121,10 @@ def level4(clock, player, flag_saw_boss, again):
                 player.bullets.remove(bullet) #要注意一旦击中就要删除子弹，不然下次循环还会把这颗子弹算上去
                 #注意一开始player和boss的子弹都是bullet，然后就有问题了，remove不掉了，后来把boss的子弹名字改成enemy_bullet就OK了
             if boss.life <= 0:
+                if flag_enemy1_boss:
+                    for enemy1 in enemies1:
+                        enemies1_down.add(enemy1)
+                        enemies1.remove(enemy1)
                 boss_flag = 0
                 boss_down_flag = 1
                 player.score += 1000
@@ -2681,7 +2685,7 @@ def level5(clock, player, flag_saw_boss, again):
                 if boss.ishit_flag == 1:
                     boss.ishit_flag = 0  # 只是那一下才会触发，之后就没有ishit的flag了
                  
-                if boss.life < 18 and boss.summon == 0 and boss_summon_flag == 0 and boss_summon_down_flag == 0:
+                if boss.life < 25 and boss.summon == 0 and boss_summon_flag == 0 and boss_summon_down_flag == 0:
                     boss_summon = Boss_summon(boss_img, boss_down_img, boss_pos)
                     boss_summon_flag = 1
                     boss_summon_once_flag = 1
@@ -2689,16 +2693,25 @@ def level5(clock, player, flag_saw_boss, again):
                 if boss.summon > 0:
                     boss.summon -= 1
                 
-                if boss.life < 10 and (boss.enemy1 == 0 or boss.enemy1 == 30 or boss.enemy1 == 60 or boss.enemy1 == 90):
+                if boss.life < 15 and (boss.enemy1 == 0 or boss.enemy1 == 30 or boss.enemy1 == 60 or boss.enemy1 == 90):
                     for one in range(0, 5):
                         enemy1_pos = [random.randint(0, SCREEN_WIDTH - enemy1_rect[0].width), 0]
                         enemy1 = Enemy1_level5(enemy1_img, enemy1_down_img, enemy1_pos)
                         enemies1.add(enemy1)
                     if boss.enemy1 == 0:
                         boss.enemy1 = boss.enemy1_recharge
-                if boss.life < 10:
+                if boss.life < 15:
                     if boss.enemy1 > 0:
                         boss.enemy1 -= 1
+                    
+                if boss.life < 10 and boss.bullet_max == 8:
+                    # print 'Now boss raise the attack'
+                    boss.bullet_max = 10
+                    boss.bullet = 10
+                    boss.shoot_frequency_time = 25
+                    boss.recharge_time = 30
+                    boss.speed = 7
+                    boss.bomb_damage = 1
                     
                 boss.move(target, boss.mode)
                 
@@ -2724,7 +2737,7 @@ def level5(clock, player, flag_saw_boss, again):
                             boss.shoot_frequency += 1
                             
                     if boss.mode == 0:
-                        if boss.shoot_frequency >= 40:
+                        if boss.shoot_frequency >= 50:
                             if abs(target) < 200:
                                 boss.normal_shoot(bullet_enemy_img)
                                 bullet_sound.play()
@@ -2764,6 +2777,9 @@ def level5(clock, player, flag_saw_boss, again):
                 player.bullets.remove(bullet) #要注意一旦击中就要删除子弹，不然下次循环还会把这颗子弹算上去
                 #注意一开始player和boss的子弹都是bullet，然后就有问题了，remove不掉了，后来把boss的子弹名字改成enemy_bullet就OK了
             if boss.life <= 0:
+                for enemy1 in enemies:
+                    enemies1_down.add(enemy1)
+                    enemies1.remove(enemy1)
                 boss_flag = 0
                 boss_down_flag = 1
                 player.score += 2000

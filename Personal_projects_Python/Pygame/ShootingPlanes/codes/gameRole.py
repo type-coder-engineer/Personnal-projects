@@ -367,12 +367,12 @@ class Boss_level3(Boss_level1):
 class Boss_level4(Boss_level3):
     def __init__(self, boss_img, boss_down_img, init_pos):
         Boss_level3.__init__(self, boss_img, boss_down_img, init_pos)
-        self.bullet_max = 7
+        self.bullet_max = 8
         self.bullet = self.bullet_max
         self.shoot_frequency = 25
         self.recharge_time = 40
         self.recharging = self.recharge_time
-        self.bomb_damage = 3
+        self.bomb_damage = 2
         self.speed = 4
         self.enemy1_frequency_recharge = 600
         self.enemy1_frequency = 0 #放出追踪小飞机跟着你
@@ -489,15 +489,15 @@ class Enemy1_Boss(Enemy1):
 class Boss_level5(Enemy1):
     def __init__(self, enemy_img, enemy_down_imgs, init_pos):
         Enemy1.__init__(self, enemy_img, enemy_down_imgs, init_pos)
-        self.life = 30
-        self.bullet_max = 8
+        self.life = 35
+        self.bullet_max = 8 
         self.bullet = self.bullet_max
         self.shoot_frequency = 30
         self.shoot_frequency_time = 30
         self.enemy_bullets = pygame.sprite.Group()
-        self.recharge_time = 50
+        self.recharge_time = 40  
         self.recharging = self.recharge_time
-        self.bomb_damage = 3
+        self.bomb_damage = 2
         self.speed = 5
         self.teleportation_recharge = 300
         self.teleportation = self.teleportation_recharge
@@ -507,7 +507,7 @@ class Boss_level5(Enemy1):
         self.summon_recharge = 1000
         self.summon = 0
         self.enemy1 = 90
-        self.enemy1_recharge = 1000
+        self.enemy1_recharge = 1200
         self.flag_showup = 0
         self.rect.bottomleft = init_pos
         
@@ -574,7 +574,7 @@ class Boss_summon(Boss_level1):
     def __init__(self, boss_img, boss_down_img, init_pos):
         Boss_level1.__init__(self, boss_img, boss_down_img, init_pos)
         self.life = 10
-        self.bomb_damage = 6
+        self.bomb_damage = 4
         
 class Award(pygame.sprite.Sprite):
     def __init__(self, award_img, effective_rect, init_pos):
