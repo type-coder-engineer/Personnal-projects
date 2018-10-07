@@ -188,7 +188,7 @@ void MainWindow::on_dictionary() {
     this->setCentralWidget(window);
     this->setStyleSheet("#mainWindow{border-image:url(:/image/bg1.png);}");
 
-    QLabel *label = new QLabel("宠物小精灵图鉴", window);
+    QLabel *label = new QLabel("神奇宝贝图鉴", window);
     QFont labelFont;
     labelFont.setPointSize(30);
     labelFont.setBold(true);
@@ -212,7 +212,7 @@ void MainWindow::on_dictionary() {
     list->setIconSize(QSize(200,200));
     list->setResizeMode(QListWidget::Adjust); // 调整list中图片的大小
 
-    list->setGeometry(QRect(QPoint(250, 120),QSize(700, 530)));
+    list->setGeometry(QRect(QPoint(150, 120),QSize(900, 530)));   //QSize(700, 530)
     label->setGeometry(QRect(QPoint(420, 20),QSize(400, 100)));
     returnButton->setGeometry(QRect(QPoint(490, 680), QSize(220, 60)));
     connect(returnButton, SIGNAL(clicked(bool)), this, SLOT(on_welcome()));
@@ -286,6 +286,7 @@ void MainWindow::writeSetting() {
     mySettings.setValue("first100", first100);
     mySettings.setValue("superRare", superRare);
     mySettings.setValue("catchAll", catchAll);
+    mySettings.setValue("gameLevel", gameLevel);
 }
 
 void MainWindow::readSetting() {
@@ -306,6 +307,7 @@ void MainWindow::readSetting() {
     first100 = mySettings.value("first100").toBool();
     superRare = mySettings.value("superRare").toBool();
     catchAll = mySettings.value("catchAll").toBool();
+    gameLevel = mySettings.value("gameLevel").toInt();
 }
 
 // 重载关闭事件来加入保存设置

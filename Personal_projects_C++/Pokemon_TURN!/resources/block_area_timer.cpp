@@ -33,17 +33,55 @@ BlockAreaCatch::BlockAreaCatch(int level, QWidget* parent)
         }
         myRow = 4;
         myColumn = 7;
-        counter = 750;  // 75 秒
+        counter = 650;  // 65 秒
     }
     else {
         int index = 88;
-        while(index < 152) {
-            level3.push_back(index);
-            index += 1;
+        srand(time(0));
+        int luck = std::rand()%30;  // 减少稀有神奇宝贝的出现概率
+        if (luck == 1) {  // 有梦幻
+            while(index < 152) {
+                if (index != 134 && index != 135 && index != 136 && index != 137 && index != 142 && index != 144 && index != 145 && index != 146 && index != 150) {
+                    level3.push_back(index);
+                }
+                ++index;
+            }
+        }
+        else if (luck == 2) {  // 有超梦
+            while(index < 152) {
+                if (index != 134 && index != 135 && index != 136 && index != 137 && index != 142 && index != 144 && index != 145 && index != 146 && index != 151) {
+                    level3.push_back(index);
+                }
+                ++index;
+            }
+        }
+        else if (luck >= 3 && luck <= 5){  // 有三只鸟
+            while(index < 152) {
+                if (index != 134 && index != 135 && index != 136 && index != 137 && index != 142 && index != 150 && index != 151) {
+                    level3.push_back(index);
+                }
+                ++index;
+            }
+        }
+        else if (luck >= 6 && luck <= 10) {  // 有伊布三种形态，3D龙，化石翼龙
+            while(index < 152) {
+                if (index != 144 && index != 145 && index != 146 && index != 150 && index != 151) {
+                    level3.push_back(index);
+                }
+                ++index;
+            }
+        }
+        else {
+            while(index < 152) {
+                if (index != 134 && index != 135 && index != 136 && index != 137 && index != 142 && index != 144 && index != 145 && index != 146 && index != 150 && index != 151) {
+                    level3.push_back(index);
+                }
+                ++index;
+            }
         }
         myRow = 5;
         myColumn = 8;
-        counter = 1000;  // 100 秒
+        counter = 800;  // 80 秒
     }
 
     mygame = new fun(myRow, myColumn);
@@ -170,6 +208,8 @@ void BlockAreaCatch::clickState(Block *block) {
 void BlockAreaCatch::choosePicture() {
     int total;// 这个主题总的图片数目
     std::vector<int> options;
+    srand(time(0));
+
     if (myLevel == 1) {
         total = level1.size();
         options = level1;
@@ -179,19 +219,21 @@ void BlockAreaCatch::choosePicture() {
         options = level2;
     }
     else {
-        int luck = std::rand()%5;
-        if (luck == 1) {
-            total = level3.size();
-            options = level3;
-        }
-        else {
-            total = level3.size() - 2;
-            options = level3;
-            options.pop_back();
-            options.pop_back();
-        }
+        total = level3.size();
+        options = level3;
+
+//        int luck = std::rand()%5;
+//        if (luck == 1) {
+//            total = level3.size();
+//            options = level3;
+//        }
+//        else {
+//            total = level3.size() - 2;
+//            options = level3;
+//            options.pop_back();
+//            options.pop_back();
+//        }
     }
-    srand(time(0));
     myPicture.insert(std::make_pair(1, options[std::rand()%total]));
     res.push_back(myPicture[1]);
 
