@@ -93,7 +93,7 @@ def parsePage(page, interpreter, device, filename):
                 continue
                 
             elif (date != 'confuse'):
-                dateTemp = dateMatchPattern(info)
+                dateTemp = dateMatchPattern(info, filename)
                 if dateTemp and date:
                     print 'We find more than one date in this file ', filename
                     date = 'confuse'
@@ -131,18 +131,18 @@ def valueMatchPattern(info):
             value = float(valueInfo[0])
     return value
         
-def dateMatchPattern(info):
+def dateMatchPattern(info, filename):
     if ('年' in info and '月' in info and '日' in info):
-        return getDate(info, 1)
+        return getDate(info, 1, filename)
     else:
         numberMatch = re.findall('\d+', info)  # seperate the number from the space or special char
         if len(numberMatch) >= 3:
             info = '/'.join(one for one in numberMatch)
-            return getDate(info, 2) 
+            return getDate(info, 2, filename) 
         else:
             return ''
         
-def getDate(info, pattern):
+def getDate(info, pattern, filename):
     date = ''
     if (pattern == 1):
         allInfo = info.split('\n')
