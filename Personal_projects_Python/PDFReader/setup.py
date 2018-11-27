@@ -1,6 +1,6 @@
 #! /usr/bin/env python  
 # -*- coding: utf-8 -*-  
-# 用法: 和所有需要的py文件放在同一个目录下，然后console里面打 python setup.py py2exe 即可
+# 用法: 和所有需要的py文件放在同一个目录下，然后console里面打 python2 setup.py py2exe 即可
 
 from distutils.core import setup  
 import py2exe  
