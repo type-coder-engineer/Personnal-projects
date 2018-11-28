@@ -4,8 +4,8 @@ from PIL import Image
 def treatImage(filename, x1, y1, x2, y2, level):
     target = Image.open(filename)    
     data = target.getdata()
-    width = target.size[0]
-    length = target.size[1]
+    width = target.size[0]  # horizontal pixel number
+    length = target.size[1]  # vertiacl pixel number
     newData = []
     
     if x1 > width or x2 > width or y1 > length or y2 > length:
@@ -17,25 +17,25 @@ def treatImage(filename, x1, y1, x2, y2, level):
         newData.append(data[i])
     
     print 'Begin to treat the picture'
-    count = 1
     for i in range(x1, x2, level):
         for j in range(y1, y2, level):
             listPixel = []
             for m in range(0, level):
                 for n in range(0, level):
-                    # print count
+                    # print '**********************************'
+                    # print i
+                    # print j
                     # print m
                     # print n
-                    # print (j + n)*width + i + m
-                    # print data[(j + n)*width + i + m]
-                    listPixel.append(data[(j + n)*width + i + m])
-                    count += 1
+                    # print (j + n - 1)*width + i + m
+                    if ((j + n) <= y2) and ((i + m) <= x2):
+                        listPixel.append(data[(j + n - 1)*width + i + m - 1])
+
             mergedPixel = mergePixel(listPixel)
-            # print mergedPixel
-            # print '**********************************'
             for m in range(0, level):
                 for n in range(0, level):
-                    newData[(j + n)*width + i + m] = mergedPixel
+                    if ((j + n) <= y2) and ((i + m) <= x2):
+                        newData[(j + n - 1)*width + i + m - 1] = mergedPixel
     print 'Finish process'
     
     newFilename = 'new_' + filename;
@@ -49,9 +49,8 @@ def mergePixel(listPixel):
     B = 0
     A = 0
     length = len(listPixel)
-   
+    
     for i in range(length):
-        # print listPixel[i]
         R += listPixel[i][0]
         G += listPixel[i][1]
         B += listPixel[i][2]
@@ -60,11 +59,12 @@ def mergePixel(listPixel):
     G = G/length
     B = B/length
     A = A/length
+    
     return (R, G, B, A)
 
 
 if __name__ == "__main__":
-    treatImage('1.png', 10, 10, 100, 100, 8)
+    treatImage('1.png', 0, 00, 100, 150, 7)
     print 'All done!'
     
     
